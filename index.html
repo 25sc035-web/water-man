@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Textile Factory Water & Cost Optimization System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Top Navigation & Brand Header -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      
+      <!-- Logo & System Title -->
+      <div class="flex items-center gap-3 cursor-pointer" onclick="goToStep(1)">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg shadow-md shadow-blue-500/20">
+          <i class="fa-solid fa-droplet"></i>
+        </div>
+        <div>
+          <h1 class="text-base font-bold text-slate-900 leading-tight">Textile Water Optimizer</h1>
+          <p class="text-xs text-slate-500 font-medium">Water & Cost Optimization System</p>
+        </div>
+      </div>
+
+      <!-- Quick Nav & User status -->
+      <div class="flex items-center gap-4">
+        <span id="user-header-status" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+          <i class="fa-solid fa-building text-blue-500"></i> ABC Textiles
+        </span>
+        <button onclick="startQuickDemo()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+          <i class="fa-solid fa-bolt mr-1"></i> Quick Demo
+        </button>
+      </div>
+    </div>
+
+    <!-- Stepper Navigation (Steps 1 to 9) -->
+    <div class="step-nav bg-slate-100/80 border-t border-slate-200/80 overflow-x-auto py-2 px-4 no-print">
+      <div class="max-w-7xl mx-auto flex items-center justify-between min-w-[760px] gap-2">
+        
+        <button onclick="goToStep(1)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">1</span>
+          <span>Home</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(2)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">2</span>
+          <span>Login</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(3)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">3</span>
+          <span>Factory</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(4)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">4</span>
+          <span>Processes</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(5)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">5</span>
+          <span>Analysis</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(6)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">6</span>
+          <span>Dashboard</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(7)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">7</span>
+          <span>Actions</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(8)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">8</span>
+          <span>Report</span>
+        </button>
+        <i class="fa-solid fa-chevron-right text-[10px] text-slate-400"></i>
+
+        <button onclick="goToStep(9)" class="step-nav-btn flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium text-slate-600 hover:text-blue-600 hover:bg-white transition-all">
+          <span class="w-5 h-5 rounded-full bg-slate-200 text-slate-700 flex items-center justify-center text-[10px] font-bold">9</span>
+          <span>Further</span>
+        </button>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content Body -->
+  <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+
+    <!-- ==========================================
+         STEP 1: HOME PAGE
+         ========================================== -->
+    <section id="step-1" class="step-view">
+      <div class="relative overflow-hidden rounded-3xl bg-slate-900 text-white p-8 sm:p-12 mb-8 shadow-xl">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-900/80 via-indigo-900/60 to-slate-900/90 pointer-events-none"></div>
+        <div class="relative z-10 max-w-2xl">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-semibold mb-4 border border-blue-400/30">
+            <i class="fa-solid fa-industry"></i> Industry 4.0 Water Sustainability
+          </div>
+          <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight mb-4">
+            Textile Factory <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-teal-300">Water & Cost Optimizer</span>
+          </h2>
+          <p class="text-lg text-slate-300 mb-6 font-medium">
+            Analyze · Reduce · Reuse · Save
+          </p>
+          <p class="text-sm text-slate-400 mb-8 leading-relaxed">
+            A comprehensive engineering intelligence platform tailored for textile dyeing, finishing, and processing mills. Pinpoint wet-processing wastage, evaluate counter-current recycling, and drive continuous utility savings.
+          </p>
+
+          <!-- Industry Selection -->
+          <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 mb-6">
+            <div class="bg-white/10 backdrop-blur-md rounded-xl p-2.5 border border-white/15 flex items-center gap-2">
+              <span class="text-xs text-slate-300 font-semibold pl-2">Select Industry:</span>
+              <select class="bg-slate-800 text-white text-xs font-semibold rounded-lg px-3 py-1.5 border border-slate-600 focus:outline-none">
+                <option value="textile" selected>Textile & Apparel Mills</option>
+                <option value="dyeing">Dyeing & Bleaching Units</option>
+                <option value="denim">Denim Processing Plants</option>
+              </select>
+            </div>
+
+            <button onclick="goToStep(2)" class="px-7 py-3 rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-bold text-sm shadow-lg shadow-blue-500/30 flex items-center justify-center gap-2 transition-transform active:scale-95">
+              <span>Get Started</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Feature Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-magnifying-glass-chart"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-2">1. Process Audits</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">Map water, electricity, and chemical footprints across every textile processing stage.</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-recycle"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-2">2. Smart Recycling</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">Identify rinse water recovery and low-liquor ratio upgrades with quantifiable savings.</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-2">3. Cost Reduction</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">Achieve average cost reductions of 15% to 30% per month with immediate payback.</p>
+        </div>
+
+        <div class="glass-card p-6 rounded-2xl border border-slate-200">
+          <div class="w-12 h-12 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4">
+            <i class="fa-solid fa-file-pdf"></i>
+          </div>
+          <h3 class="text-base font-bold text-slate-800 mb-2">4. Executive Reports</h3>
+          <p class="text-xs text-slate-500 leading-relaxed">One-click audit reports ready for factory management and compliance audits.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 2: LOGIN / SIGN UP
+         ========================================== -->
+    <section id="step-2" class="step-view hidden">
+      <div class="max-w-md mx-auto my-8">
+        <div class="glass-card rounded-3xl p-8 border border-slate-200 shadow-xl">
+          
+          <div class="text-center mb-6">
+            <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 mx-auto flex items-center justify-center text-2xl mb-3">
+              <i class="fa-solid fa-industry"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900">Textile Water Optimizer</h2>
+            <p class="text-xs text-slate-500 mt-1">Sign in to your factory optimization workspace</p>
+          </div>
+
+          <!-- Tab Selector -->
+          <div class="flex rounded-xl bg-slate-100 p-1 mb-6">
+            <button class="w-1/2 py-2 text-xs font-bold rounded-lg bg-white text-slate-800 shadow-sm">Login</button>
+            <button class="w-1/2 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800">Sign Up</button>
+          </div>
+
+          <form id="login-form" class="space-y-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Work Email</label>
+              <div class="relative">
+                <i class="fa-regular fa-envelope absolute left-3 top-3 text-slate-400 text-sm"></i>
+                <input type="email" id="login-email" value="manager@abctextiles.com" required
+                  class="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1">Password</label>
+              <div class="relative">
+                <i class="fa-solid fa-lock absolute left-3 top-3 text-slate-400 text-sm"></i>
+                <input type="password" value="password123" required
+                  class="w-full pl-9 pr-3 py-2.5 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between text-xs">
+              <label class="flex items-center gap-2 cursor-pointer text-slate-600">
+                <input type="checkbox" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                <span>Remember me</span>
+              </label>
+              <a href="#" class="text-blue-600 hover:underline">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="w-full py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 transition-all">
+              Login to Workspace
+            </button>
+          </form>
+
+          <div class="mt-6 pt-4 border-t border-slate-100 text-center">
+            <p class="text-xs text-slate-500">
+              New user? <a href="#" class="text-blue-600 font-semibold hover:underline">Sign up for factory account</a>
+            </p>
+            <button onclick="startQuickDemo()" class="mt-3 text-xs text-slate-400 hover:text-slate-700 flex items-center justify-center gap-1 mx-auto">
+              <span>Continue as Demo Guest</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 3: FACTORY DETAILS INPUT
+         ========================================== -->
+    <section id="step-3" class="step-view hidden">
+      <div class="max-w-2xl mx-auto">
+        
+        <div class="mb-6">
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 3 of 9</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">Factory Details Input</h2>
+          <p class="text-xs text-slate-500 mt-1">Configure your textile mill capacity and utility benchmark costs</p>
+        </div>
+
+        <form id="factory-details-form" class="glass-card p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-md space-y-5">
+          
+          <!-- Factory Name -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-building text-blue-600"></i> Factory Name
+            </label>
+            <input type="text" id="input-factory-name" value="ABC Textiles" required
+              class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+          </div>
+
+          <!-- Grid: Production Capacity & Working Days -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-scale-balanced text-blue-600"></i> Production Capacity
+              </label>
+              <div class="relative">
+                <input type="number" id="input-capacity" value="1000" min="50" step="50" required
+                  class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-16">
+                <span class="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">kg/day</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-calendar-days text-blue-600"></i> Working Days per Month
+              </label>
+              <div class="relative">
+                <input type="number" id="input-working-days" value="26" min="1" max="31" required
+                  class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                <span class="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">days</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grid: Utility Costs -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-droplet text-blue-600"></i> Water Cost
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                <input type="number" id="input-water-cost" value="50" min="1" step="1" required
+                  class="w-full pl-7 pr-16 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <span class="absolute right-2 top-2.5 text-[10px] text-slate-400 font-medium">/ 1,000 L</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Electricity Cost
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                <input type="number" id="input-elec-cost" value="8" min="0.1" step="0.5" required
+                  class="w-full pl-7 pr-14 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <span class="absolute right-2 top-2.5 text-[10px] text-slate-400 font-medium">/ kWh</span>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-flask text-teal-600"></i> Chemical Cost (avg)
+              </label>
+              <div class="relative">
+                <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
+                <input type="number" id="input-chem-cost" value="120" min="1" step="5" required
+                  class="w-full pl-7 pr-12 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                <span class="absolute right-2 top-2.5 text-[10px] text-slate-400 font-medium">/ kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fabric Type Selector -->
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
+              <i class="fa-solid fa-layer-group text-blue-600"></i> Select Fabric Type
+            </label>
+            <select id="input-fabric-type" class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
+              <option value="Cotton" selected>100% Cotton (High water-intensity wet processing)</option>
+              <option value="Denim">Denim (Multiple wash and fading cycles)</option>
+              <option value="Polyester">Polyester (High-temperature pressure dyeing)</option>
+              <option value="Cotton-Poly Blend">Cotton-Polyester Blend</option>
+              <option value="Wool">Wool & Worsted Fabrics</option>
+              <option value="Silk">Silk Processing</option>
+            </select>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+            <button type="button" onclick="goToStep(2)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+              <i class="fa-solid fa-arrow-left mr-1"></i> Back
+            </button>
+            <button type="submit" class="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center gap-2">
+              <span>Next: Process-wise Data</span>
+              <i class="fa-solid fa-arrow-right text-xs"></i>
+            </button>
+          </div>
+
+        </form>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 4: PROCESS-WISE DATA INPUT
+         ========================================== -->
+    <section id="step-4" class="step-view hidden">
+      <div class="max-w-5xl mx-auto">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 4 of 9</span>
+            <h2 class="text-2xl font-extrabold text-slate-900">Process-wise Data Input</h2>
+            <p class="text-xs text-slate-500 mt-1">Enter daily water usage and utility cost breakdown for each wet process</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button id="btn-reset-processes" type="button" class="px-3 py-1.5 text-xs font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50">
+              <i class="fa-solid fa-rotate-left mr-1"></i> Reset Defaults
+            </button>
+            <button id="btn-add-process" type="button" class="px-3.5 py-1.5 text-xs font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700 shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-plus text-[10px]"></i> Add Process
+            </button>
+          </div>
+        </div>
+
+        <div class="glass-card rounded-3xl border border-slate-200 shadow-md overflow-hidden mb-6">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
+                  <th class="py-3 px-4">Process</th>
+                  <th class="py-3 px-4">Water Usage (L/day)</th>
+                  <th class="py-3 px-4">Electricity Cost (₹/day)</th>
+                  <th class="py-3 px-4">Chemical Cost (₹/day)</th>
+                  <th class="py-3 px-4">Other Cost (₹/day)</th>
+                  <th class="py-3 px-4 text-center">Action</th>
+                </tr>
+              </thead>
+              <tbody id="process-table-body">
+                <!-- Dynamically populated by app.js -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Total Footer Preview -->
+          <div class="bg-slate-50/80 p-4 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-sm font-semibold">
+            <div class="flex items-center gap-6">
+              <div>
+                <span class="text-xs text-slate-500 font-normal">Total Water Usage:</span>
+                <span id="total-water-preview" class="text-blue-700 font-bold ml-1.5">40,000 L/day</span>
+              </div>
+              <div>
+                <span class="text-xs text-slate-500 font-normal">Est. Total Daily Cost:</span>
+                <span id="total-cost-preview" class="text-slate-800 font-bold ml-1.5">₹19,000 / day</span>
+              </div>
+            </div>
+            <div class="text-xs text-slate-400 font-normal">
+              *You can edit names and numbers inline.
+            </div>
+          </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex items-center justify-between">
+          <button type="button" onclick="goToStep(3)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Factory
+          </button>
+          <button type="button" onclick="goToStep(5)" class="px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center gap-2">
+            <span>Run Analysis & Optimization</span>
+            <i class="fa-solid fa-gears text-xs"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 5: ANALYSIS & OPTIMIZATION ENGINE
+         ========================================== -->
+    <section id="step-5" class="step-view hidden">
+      <div class="max-w-xl mx-auto my-6 text-center">
+        
+        <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 text-white mx-auto flex items-center justify-center text-2xl shadow-xl shadow-blue-500/25 mb-4 animate-bounce">
+          <i class="fa-solid fa-gears"></i>
+        </div>
+
+        <h2 class="text-2xl font-extrabold text-slate-900 mb-2">Analysis & Optimization Engine</h2>
+        <p class="text-xs text-slate-500 mb-6">Running mathematical models, counter-current algorithms, and utility cost reconciliations...</p>
+
+        <!-- Progress Bar -->
+        <div class="w-full bg-slate-200 rounded-full h-2.5 mb-6 overflow-hidden">
+          <div id="engine-progress-bar" class="bg-gradient-to-r from-blue-600 to-teal-400 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+        </div>
+
+        <!-- 6 Step Algorithm Sequence from Diagram -->
+        <div class="space-y-2.5 text-left text-xs mb-8">
+          
+          <div id="engine-step-1" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">1</span>
+              <span>Calculate total water usage</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+          <div id="engine-step-2" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">2</span>
+              <span>Analyze process-wise consumption</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+          <div id="engine-step-3" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">3</span>
+              <span>Identify high consumption and wastage</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+          <div id="engine-step-4" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">4</span>
+              <span>Evaluate recycling opportunities</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+          <div id="engine-step-5" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">5</span>
+              <span>Run optimization model</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+          <div id="engine-step-6" class="flex items-center justify-between p-3 rounded-lg border border-slate-200 bg-white text-slate-600">
+            <span class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-bold">6</span>
+              <span>Estimate cost and water savings</span>
+            </span>
+            <span class="step-status-badge"><i class="fa-solid fa-spinner fa-spin text-slate-400"></i></span>
+          </div>
+
+        </div>
+
+        <button id="btn-proceed-results" onclick="goToStep(6)" class="opacity-50 pointer-events-none w-full py-3.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2">
+          <span>View Optimization Results</span>
+          <i class="fa-solid fa-arrow-right text-xs"></i>
+        </button>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 6: RESULTS DASHBOARD
+         ========================================== -->
+    <section id="step-6" class="step-view hidden">
+      <div class="max-w-6xl mx-auto space-y-6">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 6 of 9</span>
+            <h2 class="text-2xl font-extrabold text-slate-900">Results Dashboard</h2>
+            <p class="text-xs text-slate-500 mt-1">Real-time baseline vs optimized water consumption and cost impact</p>
+          </div>
+          <button onclick="goToStep(7)" class="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center gap-2">
+            <span>Next: Recommendations</span>
+            <i class="fa-solid fa-arrow-right text-[10px]"></i>
+          </button>
+        </div>
+
+        <!-- 4 KPI Cards from Diagram -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          
+          <!-- Card 1: Total Before -->
+          <div class="glass-card p-5 rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Total Water Usage</span>
+              <span class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-droplet"></i>
+              </span>
+            </div>
+            <div class="text-2xl font-black text-slate-800" id="kpi-total-before">40,000 L/day</div>
+            <div class="text-[11px] text-slate-400 font-medium mt-1">(Before Optimization)</div>
+          </div>
+
+          <!-- Card 2: Total After -->
+          <div class="glass-card p-5 rounded-2xl border border-emerald-200 bg-emerald-50/30">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-emerald-700">Total Water Usage</span>
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-droplet-slash"></i>
+              </span>
+            </div>
+            <div class="text-2xl font-black text-emerald-700" id="kpi-total-after">32,550 L/day</div>
+            <div class="text-[11px] text-emerald-600 font-semibold mt-1" id="kpi-specific-water">(After Optimization)</div>
+          </div>
+
+          <!-- Card 3: Reduction % -->
+          <div class="glass-card p-5 rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Reduction</span>
+              <span class="w-8 h-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-percent"></i>
+              </span>
+            </div>
+            <div class="text-2xl font-black text-teal-600" id="kpi-reduction-pct">18.6%</div>
+            <div class="text-[11px] text-slate-400 font-medium mt-1">Water saved across all lines</div>
+          </div>
+
+          <!-- Card 4: Monthly Saving -->
+          <div class="glass-card p-5 rounded-2xl border border-slate-200">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-semibold text-slate-500">Monthly Saving</span>
+              <span class="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-sm">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+              </span>
+            </div>
+            <div class="text-2xl font-black text-slate-900" id="kpi-monthly-saving">₹9,685</div>
+            <div class="text-[11px] text-emerald-600 font-semibold mt-1" id="kpi-annual-saving">₹1,16,220 / year</div>
+          </div>
+
+        </div>
+
+        <!-- 2 Main Charts from Diagram -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          
+          <!-- Bar Chart (Before vs After) -->
+          <div class="lg:col-span-2 glass-card p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-800">Process-wise Water Usage (Before vs After)</h3>
+              <span class="text-xs text-slate-400">Unit: Liters / Day</span>
+            </div>
+            <div class="relative flex-1 min-h-[320px]">
+              <canvas id="chart-process-bar"></canvas>
+            </div>
+          </div>
+
+          <!-- Donut Chart (Water Usage Share After) -->
+          <div class="glass-card p-6 rounded-3xl border border-slate-200 shadow-sm flex flex-col">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-sm font-bold text-slate-800">Water Usage Share (After)</h3>
+              <span class="text-xs text-slate-400">Percentage</span>
+            </div>
+            <div class="relative flex-1 min-h-[320px] flex items-center justify-center">
+              <canvas id="chart-share-donut"></canvas>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Action Row -->
+        <div class="flex items-center justify-between pt-2">
+          <button onclick="goToStep(4)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Edit Process Inputs
+          </button>
+          <button onclick="goToStep(7)" class="px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center gap-2">
+            <span>Next: Process-wise Recommendations</span>
+            <i class="fa-solid fa-arrow-right text-xs"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 7: RECOMMENDATIONS
+         ========================================== -->
+    <section id="step-7" class="step-view hidden">
+      <div class="max-w-4xl mx-auto space-y-6">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div>
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 7 of 9</span>
+            <h2 class="text-2xl font-extrabold text-slate-900">Process-wise Recommendations</h2>
+            <p class="text-xs text-slate-500 mt-1">Specific engineering interventions, water savings, and implementation priorities</p>
+          </div>
+          <span id="rec-total-saved-badge" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+            Total Water Saved: 7,450 L/day
+          </span>
+        </div>
+
+        <!-- Dynamic List of Process Recommendation Cards -->
+        <div id="recommendations-list" class="space-y-4">
+          <!-- Populated by app.js -->
+        </div>
+
+        <!-- Navigation Buttons -->
+        <div class="flex items-center justify-between pt-4">
+          <button onclick="goToStep(6)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Dashboard
+          </button>
+          <button onclick="goToStep(8)" class="px-7 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md shadow-blue-500/25 flex items-center gap-2">
+            <span>View Detailed Executive Report</span>
+            <i class="fa-solid fa-file-pdf text-xs"></i>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 8: DETAILED REPORT
+         ========================================== -->
+    <section id="step-8" class="step-view hidden">
+      <div class="max-w-4xl mx-auto">
+        
+        <!-- Controls bar (hidden in print) -->
+        <div class="flex items-center justify-between mb-6 no-print">
+          <div>
+            <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 8 of 9</span>
+            <h2 class="text-2xl font-extrabold text-slate-900">Detailed Executive Report</h2>
+          </div>
+          <div class="flex items-center gap-3">
+            <button onclick="downloadReportPDF()" class="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs shadow-md shadow-red-500/20 flex items-center gap-2 transition-all">
+              <i class="fa-solid fa-file-pdf"></i>
+              <span>Download / Print PDF</span>
+            </button>
+            <button onclick="goToStep(9)" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5">
+              <span>Further Actions</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- The Printable Document Sheet -->
+        <div class="bg-white p-8 sm:p-10 rounded-3xl border border-slate-300 shadow-xl space-y-6">
+          
+          <!-- Report Header -->
+          <div class="flex items-start justify-between border-b border-slate-200 pb-6">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center text-sm font-bold">
+                  <i class="fa-solid fa-droplet"></i>
+                </span>
+                <h3 class="text-xl font-black text-slate-900">Textile Factory Water Optimization Report</h3>
+              </div>
+              <p class="text-xs text-slate-500">Comprehensive Engineering & Resource Conservation Audit</p>
+            </div>
+            <div class="text-right">
+              <span class="px-3 py-1 rounded-md bg-red-50 text-red-700 font-bold text-xs border border-red-200">
+                <i class="fa-solid fa-file-pdf mr-1"></i> PDF Audit
+              </span>
+            </div>
+          </div>
+
+          <!-- Metadata Box -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs">
+            <div>
+              <span class="text-slate-400 block font-medium">Factory Name</span>
+              <strong id="report-factory-name" class="text-slate-800 text-sm">ABC Textiles</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Production Capacity</span>
+              <strong id="report-capacity" class="text-slate-800 text-sm">1,000 kg/day</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Fabric Type</span>
+              <strong id="report-fabric" class="text-slate-800 text-sm">Cotton</strong>
+            </div>
+            <div>
+              <span class="text-slate-400 block font-medium">Report Generated On</span>
+              <strong id="report-date" class="text-slate-800 text-sm">15 Oct 2026</strong>
+            </div>
+          </div>
+
+          <!-- Summary Highlights (from diagram) -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <span class="text-xs text-slate-500 block">Total Water Saved</span>
+              <strong id="report-total-saved" class="text-xl font-extrabold text-blue-600">7,450 L/day</strong>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <span class="text-xs text-slate-500 block">Reduction Percentage</span>
+              <strong id="report-reduction-pct" class="text-xl font-extrabold text-teal-600">18.6%</strong>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <span class="text-xs text-slate-500 block">Monthly Cost Saving</span>
+              <strong id="report-monthly-saving" class="text-xl font-extrabold text-slate-900">₹9,685</strong>
+            </div>
+            <div class="p-4 rounded-xl border border-slate-200 bg-slate-50">
+              <span class="text-xs text-slate-500 block">Annual Cost Saving</span>
+              <strong id="report-annual-saving" class="text-xl font-extrabold text-emerald-700">₹1,16,220</strong>
+            </div>
+          </div>
+
+          <!-- Process-wise Table -->
+          <div>
+            <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Process-wise Performance Summary</h4>
+            <div class="overflow-x-auto border border-slate-200 rounded-xl">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 font-bold border-b border-slate-200">
+                    <th class="py-2.5 px-3">Process</th>
+                    <th class="py-2.5 px-3 text-right">Baseline (L/d)</th>
+                    <th class="py-2.5 px-3 text-right">Optimized (L/d)</th>
+                    <th class="py-2.5 px-3 text-right">Savings (L/d)</th>
+                    <th class="py-2.5 px-3 text-right">% Cut</th>
+                    <th class="py-2.5 px-3 text-right">Monthly Saved (₹)</th>
+                  </tr>
+                </thead>
+                <tbody id="report-table-body">
+                  <!-- Dynamically generated -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Mini Chart -->
+          <div class="border border-slate-200 rounded-xl p-4">
+            <h4 class="text-xs font-bold text-slate-700 uppercase mb-2">Water Demand Comparison</h4>
+            <div class="h-44">
+              <canvas id="report-mini-chart"></canvas>
+            </div>
+          </div>
+
+          <!-- Implementation Plan & Payback -->
+          <div class="p-4 rounded-xl border border-slate-200 bg-slate-50/50 text-xs text-slate-600 space-y-1">
+            <strong class="text-slate-800 block text-sm mb-1">Implementation Plan & Payback Period</strong>
+            <p>• <strong>Phase 1 (Immediate - 0 to 30 days):</strong> Rinse water recycling in washing & fabric prep. Estimated Capital Expenditure: ₹35,000. Payback: ~3.6 months.</p>
+            <p>• <strong>Phase 2 (Medium Term - 30 to 90 days):</strong> Low-liquor ratio dyeing nozzles and automatic stop valves. Payback: ~6.2 months.</p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ==========================================
+         STEP 9: FURTHER ACTIONS
+         ========================================== -->
+    <section id="step-9" class="step-view hidden">
+      <div class="max-w-5xl mx-auto space-y-6">
+        
+        <div>
+          <span class="text-xs font-bold text-blue-600 uppercase tracking-wider">Step 9 of 9</span>
+          <h2 class="text-2xl font-extrabold text-slate-900">Further Actions</h2>
+          <p class="text-xs text-slate-500 mt-1">Continuous improvement, scenario comparisons, alerts, and tracking</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          
+          <!-- Action 1: Save & Export Data -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3">
+                <i class="fa-solid fa-cloud-arrow-up"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">Save Data for Future Reference</h3>
+              <p class="text-xs text-slate-500 mb-4">Export audit data in JSON or save locally to browser workspace.</p>
+            </div>
+            <button onclick="exportProjectJSON()" class="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5">
+              <i class="fa-solid fa-download"></i> Export JSON Data
+            </button>
+          </div>
+
+          <!-- Action 2: Modify Inputs -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center text-lg mb-3">
+                <i class="fa-solid fa-sliders"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">Modify Inputs & Re-run</h3>
+              <p class="text-xs text-slate-500 mb-4">Adjust working days, water rates, or machine processes and recompute.</p>
+            </div>
+            <div class="flex gap-2">
+              <button onclick="goToStep(3)" class="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">
+                Edit Factory
+              </button>
+              <button onclick="goToStep(4)" class="w-1/2 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs">
+                Edit Processes
+              </button>
+            </div>
+          </div>
+
+          <!-- Action 3: Compare Scenarios -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-lg mb-3">
+                <i class="fa-solid fa-code-compare"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">Compare Scenarios</h3>
+              <p class="text-xs text-slate-500 mb-3">Test standard vs aggressive recycling models.</p>
+            </div>
+            <div class="flex flex-col gap-1.5">
+              <button id="scenario-standard" onclick="setOptimizationScenario('standard')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-md text-left flex items-center justify-between">
+                <span>Standard Recycling</span>
+                <span class="text-[10px]">~18.6%</span>
+              </button>
+              <button id="scenario-advanced" onclick="setOptimizationScenario('advanced')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 text-left flex items-center justify-between">
+                <span>Advanced Counter-Current</span>
+                <span class="text-[10px]">~25%</span>
+              </button>
+              <button id="scenario-eco_max" onclick="setOptimizationScenario('eco_max')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 text-left flex items-center justify-between">
+                <span>Closed Loop Membrane (ZLD)</span>
+                <span class="text-[10px]">~32%</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Action 4: Water Saving Target Slider -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm md:col-span-2">
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-lg">
+                <i class="fa-solid fa-bullseye"></i>
+              </div>
+              <div>
+                <h3 class="text-sm font-bold text-slate-800">Set Water Saving Targets</h3>
+                <p class="text-xs text-slate-500">Simulate customized water reduction goals for your factory team</p>
+              </div>
+            </div>
+            <div class="space-y-3 mt-4">
+              <div class="flex items-center justify-between text-xs font-semibold">
+                <span>Reduction Target:</span>
+                <span id="target-reduction-val" class="text-emerald-700 font-bold text-sm">20%</span>
+              </div>
+              <input type="range" id="target-reduction-slider" min="5" max="45" step="1" value="20"
+                class="w-full accent-emerald-600 cursor-pointer" oninput="updateTargetReduction(this.value)">
+              <div id="target-impact-feedback" class="p-3 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600">
+                Adjust slider to dynamically calculate target water savings and impact.
+              </div>
+            </div>
+          </div>
+
+          <!-- Action 5: Alerts & Recommendations -->
+          <div class="glass-card p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3">
+                <i class="fa-solid fa-bell"></i>
+              </div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">Alerts & Notifications</h3>
+              <p class="text-xs text-slate-500 mb-3">Get automated threshold alerts when consumption exceeds normal limits.</p>
+            </div>
+            <div class="space-y-2 text-xs">
+              <label class="flex items-center gap-2 text-slate-700">
+                <input type="checkbox" checked class="rounded text-blue-600">
+                <span>Alert on Dyeing spike > 16,000 L</span>
+              </label>
+              <label class="flex items-center gap-2 text-slate-700">
+                <input type="checkbox" checked class="rounded text-blue-600">
+                <span>Weekly compliance digest email</span>
+              </label>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Back to Start -->
+        <div class="flex items-center justify-between pt-6 border-t border-slate-200">
+          <button onclick="goToStep(8)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
+            <i class="fa-solid fa-arrow-left mr-1"></i> Back to Report
+          </button>
+          <button onclick="goToStep(1)" class="px-6 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2">
+            <i class="fa-solid fa-house"></i>
+            <span>Return to Home</span>
+          </button>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-white border-t border-slate-200 py-4 mt-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
+      Textile Factory Water & Cost Optimization System • Built with Pair Programming Intelligence
+    </div>
+  </footer>
+
+  <!-- Main JavaScript Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
