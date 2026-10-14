@@ -1,0 +1,147 @@
+{
+  "factory": {
+    "name": "ABC Textiles",
+    "capacity": 1000,
+    "workingDays": 26,
+    "waterCost": 50,
+    "electricityCost": 7.1,
+    "chemicalCost": 151,
+    "fabricType": "Cotton"
+  },
+  "processes": [
+    {
+      "id": 1,
+      "name": "Fabric Preparation",
+      "water": 8000,
+      "electricity": 1200,
+      "chemical": 1500,
+      "other": 1300,
+      "savingPct": 0.15,
+      "recommendation": "Reuse rinse water, optimize chemical dose",
+      "priority": "Medium",
+      "icon": "fa-lightbulb"
+    },
+    {
+      "id": 2,
+      "name": "Dyeing",
+      "water": 15000,
+      "electricity": 2500,
+      "chemical": 3000,
+      "other": 2000,
+      "savingPct": 0.15,
+      "recommendation": "Improve dyeing efficiency, use low-liquor ratio machines",
+      "priority": "High",
+      "icon": "fa-flask"
+    },
+    {
+      "id": 3,
+      "name": "Washing & Rinsing",
+      "water": 10000,
+      "electricity": 1500,
+      "chemical": 800,
+      "other": 1200,
+      "savingPct": 0.3,
+      "recommendation": "Optimize rinse cycles, reuse suitable rinse water",
+      "priority": "High",
+      "icon": "fa-recycle"
+    },
+    {
+      "id": 4,
+      "name": "Finishing",
+      "water": 4000,
+      "electricity": 800,
+      "chemical": 600,
+      "other": 1100,
+      "savingPct": 0.1,
+      "recommendation": "Use low-water finishing techniques",
+      "priority": "Low",
+      "icon": "fa-spray-can"
+    },
+    {
+      "id": 5,
+      "name": "Machine Cleaning",
+      "water": 3000,
+      "electricity": 500,
+      "chemical": 300,
+      "other": 700,
+      "savingPct": 0.2,
+      "recommendation": "Use high-pressure low-flow cleaning systems",
+      "priority": "Medium",
+      "icon": "fa-faucet-drip"
+    }
+  ],
+  "results": {
+    "totalBefore": 40000,
+    "totalAfter": 32550,
+    "totalSaved": 7450,
+    "reductionPct": 18.6,
+    "dailyCostSaving": 373,
+    "monthlyCostSaving": 9685,
+    "annualCostSaving": 116220,
+    "specificWaterBefore": 40,
+    "specificWaterAfter": 32.5,
+    "breakdown": [
+      {
+        "id": 1,
+        "name": "Fabric Preparation",
+        "waterBefore": 8000,
+        "waterAfter": 6800,
+        "waterSaved": 1200,
+        "savingPct": 15,
+        "recommendation": "Reuse rinse water, optimize chemical dose",
+        "priority": "Medium",
+        "icon": "fa-lightbulb",
+        "shareAfter": 21
+      },
+      {
+        "id": 2,
+        "name": "Dyeing",
+        "waterBefore": 15000,
+        "waterAfter": 12750,
+        "waterSaved": 2250,
+        "savingPct": 15,
+        "recommendation": "Improve dyeing efficiency, use low-liquor ratio machines",
+        "priority": "High",
+        "icon": "fa-flask",
+        "shareAfter": 39
+      },
+      {
+        "id": 3,
+        "name": "Washing & Rinsing",
+        "waterBefore": 10000,
+        "waterAfter": 7000,
+        "waterSaved": 3000,
+        "savingPct": 30,
+        "recommendation": "Optimize rinse cycles, reuse suitable rinse water",
+        "priority": "High",
+        "icon": "fa-recycle",
+        "shareAfter": 22
+      },
+      {
+        "id": 4,
+        "name": "Finishing",
+        "waterBefore": 4000,
+        "waterAfter": 3600,
+        "waterSaved": 400,
+        "savingPct": 10,
+        "recommendation": "Use low-water finishing techniques",
+        "priority": "Low",
+        "icon": "fa-spray-can",
+        "shareAfter": 11
+      },
+      {
+        "id": 5,
+        "name": "Machine Cleaning",
+        "waterBefore": 3000,
+        "waterAfter": 2400,
+        "waterSaved": 600,
+        "savingPct": 20,
+        "recommendation": "Use high-pressure low-flow cleaning systems",
+        "priority": "Medium",
+        "icon": "fa-faucet-drip",
+        "shareAfter": 7
+      }
+    ],
+    "generatedAt": "14 Oct 2026"
+  }
+}
