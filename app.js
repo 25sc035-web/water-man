@@ -887,3 +887,21 @@ window.closeFlowchartModal = function() {
   }
 };
 
+// Simulation Lightbox Modal Controls
+window.openSimulationModal = function() {
+  const modal = document.getElementById('simulation-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeSimulationModal = function() {
+  const modal = document.getElementById('simulation-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+
