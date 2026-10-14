@@ -217,32 +217,216 @@
         </div>
       </div>
 
-      <!-- Properly Placed System Workflow Flowchart Component -->
-      <div class="mt-8 p-6 sm:p-8 rounded-3xl bg-white border border-slate-200 shadow-sm">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4">
+      <!-- ==========================================
+           FLOW OF WORK (9-STAGE SYSTEM PIPELINE)
+           ========================================== -->
+      <div class="mt-10 p-6 sm:p-8 rounded-3xl bg-white border border-slate-200/90 shadow-md">
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
           <div>
-            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-200">
-              <i class="fa-solid fa-diagram-project text-blue-500"></i> System Architecture
+            <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold mb-1.5">
+              <i class="fa-solid fa-arrows-split-up-and-left text-blue-600"></i> Website Workflow
             </span>
-            <h3 class="text-lg font-bold text-slate-900 mt-1">How It Works • 9-Stage Operational Flowchart</h3>
-            <p class="text-xs text-slate-500">Follow the engineering workflow from data collection to real-time savings & PDF audit generation</p>
+            <h3 class="text-2xl font-black text-slate-900 tracking-tight">Flow of Work</h3>
+            <p class="text-xs text-slate-500">End-to-End Operational Journey of Textile Factory Water & Cost Optimization</p>
           </div>
-          <button onclick="openFlowchartModal()" class="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-sm flex items-center gap-2 transition-all">
-            <i class="fa-solid fa-expand text-[10px]"></i>
-            <span>Enlarge Flowchart</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <button onclick="openFlowchartModal()" class="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors">
+              <i class="fa-solid fa-image text-slate-500"></i> View Original Diagram
+            </button>
+            <button onclick="goToStep(2)" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
+              <span>Start Workflow</span> <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Framed Flowchart Image Preview -->
-        <div class="relative rounded-2xl overflow-hidden border border-slate-200 bg-slate-950 cursor-pointer group" onclick="openFlowchartModal()">
-          <img src="workflow-flowchart.jpg" alt="Textile Factory Water & Cost Optimization Workflow Flowchart" class="w-full max-h-[360px] object-contain mx-auto group-hover:scale-[1.01] transition-transform duration-300">
-          <div class="absolute inset-0 bg-slate-900/10 group-hover:bg-slate-900/30 transition-colors flex items-center justify-center">
-            <div class="opacity-0 group-hover:opacity-100 transition-opacity px-4 py-2 rounded-xl bg-white/95 text-slate-900 font-bold text-xs shadow-xl flex items-center gap-2 backdrop-blur-md">
-              <i class="fa-solid fa-magnifying-glass-plus text-blue-600"></i>
-              <span>Click to View Fullscreen</span>
+        <!-- 9 Connected Steps Pipeline in Responsive Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+
+          <!-- Step 1 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-purple-200 bg-purple-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-purple-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">1</span>
+                <h4 class="font-bold text-sm text-slate-800">Home Page</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-purple-100 text-purple-700 flex items-center justify-center text-sm"><i class="fa-solid fa-house"></i></span>
             </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Project introduction</span></li>
+              <li class="flex items-start gap-1.5">• <span>Benefits & savings potential</span></li>
+              <li class="flex items-start gap-1.5">• <span>Get Started button</span></li>
+              <li class="flex items-start gap-1.5">• <span>Select your industry (Textile)</span></li>
+            </ul>
+            <button onclick="goToStep(1)" class="w-full py-1.5 rounded-lg bg-white border border-purple-200 text-purple-700 font-bold text-xs hover:bg-purple-600 hover:text-white transition-colors">
+              Active Step
+            </button>
           </div>
+
+          <!-- Step 2 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-blue-200 bg-blue-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-blue-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">2</span>
+                <h4 class="font-bold text-sm text-slate-800">Login / Sign Up</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center text-sm"><i class="fa-solid fa-user-lock"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>User registration</span></li>
+              <li class="flex items-start gap-1.5">• <span>Login with email & password</span></li>
+              <li class="flex items-start gap-1.5">• <span>Secure access to dashboard</span></li>
+              <li class="flex items-start gap-1.5">• <span>Store user data & sessions</span></li>
+            </ul>
+            <button onclick="goToStep(2)" class="w-full py-1.5 rounded-lg bg-white border border-blue-200 text-blue-700 font-bold text-xs hover:bg-blue-600 hover:text-white transition-colors">
+              Go to Step 2 →
+            </button>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-emerald-200 bg-emerald-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">3</span>
+                <h4 class="font-bold text-sm text-slate-800">Factory Details Input</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm"><i class="fa-solid fa-industry"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Basic factory information</span></li>
+              <li class="flex items-start gap-1.5">• <span>Production capacity (kg/day)</span></li>
+              <li class="flex items-start gap-1.5">• <span>Utility costs (water, power, chem)</span></li>
+              <li class="flex items-start gap-1.5">• <span>Fabric type and working days</span></li>
+            </ul>
+            <button onclick="goToStep(3)" class="w-full py-1.5 rounded-lg bg-white border border-emerald-200 text-emerald-700 font-bold text-xs hover:bg-emerald-600 hover:text-white transition-colors">
+              Go to Step 3 →
+            </button>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-amber-200 bg-amber-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-amber-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">4</span>
+                <h4 class="font-bold text-sm text-slate-800">Process-wise Data Input</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-sm"><i class="fa-solid fa-table-list"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Enter water usage for each process</span></li>
+              <li class="flex items-start gap-1.5">• <span>Enter cost details for each process</span></li>
+              <li class="flex items-start gap-1.5">• <span>Can add/edit more processes</span></li>
+              <li class="flex items-start gap-1.5">• <span>Real-time consumption preview</span></li>
+            </ul>
+            <button onclick="goToStep(4)" class="w-full py-1.5 rounded-lg bg-white border border-amber-200 text-amber-700 font-bold text-xs hover:bg-amber-600 hover:text-white transition-colors">
+              Go to Step 4 →
+            </button>
+          </div>
+
+          <!-- Step 5 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-rose-200 bg-rose-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-rose-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">5</span>
+                <h4 class="font-bold text-sm text-slate-800">Analysis & Optimization</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-rose-100 text-rose-700 flex items-center justify-center text-sm"><i class="fa-solid fa-gears"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>1. Calculate total water usage</span></li>
+              <li class="flex items-start gap-1.5">• <span>2. Analyze process-wise consumption</span></li>
+              <li class="flex items-start gap-1.5">• <span>3. Identify high wastage streams</span></li>
+              <li class="flex items-start gap-1.5">• <span>4. Evaluate recycling opportunities</span></li>
+              <li class="flex items-start gap-1.5">• <span>5. Run optimization model</span></li>
+              <li class="flex items-start gap-1.5">• <span>6. Estimate cost and water savings</span></li>
+            </ul>
+            <button onclick="goToStep(5)" class="w-full py-1.5 rounded-lg bg-white border border-rose-200 text-rose-700 font-bold text-xs hover:bg-rose-600 hover:text-white transition-colors">
+              Go to Step 5 →
+            </button>
+          </div>
+
+          <!-- Step 6 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-teal-200 bg-teal-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-teal-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">6</span>
+                <h4 class="font-bold text-sm text-slate-800">Results Dashboard</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-teal-100 text-teal-700 flex items-center justify-center text-sm"><i class="fa-solid fa-chart-pie"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Graphs and charts (before vs after)</span></li>
+              <li class="flex items-start gap-1.5">• <span>Process-wise breakdown & share</span></li>
+              <li class="flex items-start gap-1.5">• <span>Total savings & 18.6% reduction</span></li>
+              <li class="flex items-start gap-1.5">• <span>Visual comparison & KPI metrics</span></li>
+            </ul>
+            <button onclick="goToStep(6)" class="w-full py-1.5 rounded-lg bg-white border border-teal-200 text-teal-700 font-bold text-xs hover:bg-teal-600 hover:text-white transition-colors">
+              Go to Step 6 →
+            </button>
+          </div>
+
+          <!-- Step 7 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-emerald-200 bg-emerald-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-emerald-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">7</span>
+                <h4 class="font-bold text-sm text-slate-800">Recommendations</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center text-sm"><i class="fa-solid fa-lightbulb"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Process-wise suggestions</span></li>
+              <li class="flex items-start gap-1.5">• <span>Expected water and cost savings</span></li>
+              <li class="flex items-start gap-1.5">• <span>Implementation cost (optional)</span></li>
+              <li class="flex items-start gap-1.5">• <span>Priority level (High / Medium / Low)</span></li>
+            </ul>
+            <button onclick="goToStep(7)" class="w-full py-1.5 rounded-lg bg-white border border-emerald-200 text-emerald-700 font-bold text-xs hover:bg-emerald-600 hover:text-white transition-colors">
+              Go to Step 7 →
+            </button>
+          </div>
+
+          <!-- Step 8 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-red-200 bg-red-50/20 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-red-600 text-white font-bold text-xs flex items-center justify-center shadow-sm">8</span>
+                <h4 class="font-bold text-sm text-slate-800">Detailed Report</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-red-100 text-red-700 flex items-center justify-center text-sm"><i class="fa-solid fa-file-pdf"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Downloadable PDF report</span></li>
+              <li class="flex items-start gap-1.5">• <span>Summary of inputs and outputs</span></li>
+              <li class="flex items-start gap-1.5">• <span>Graphs and tables</span></li>
+              <li class="flex items-start gap-1.5">• <span>Implementation plan & payback period</span></li>
+            </ul>
+            <button onclick="goToStep(8)" class="w-full py-1.5 rounded-lg bg-white border border-red-200 text-red-700 font-bold text-xs hover:bg-red-600 hover:text-white transition-colors">
+              Go to Step 8 →
+            </button>
+          </div>
+
+          <!-- Step 9 -->
+          <div class="relative flex flex-col p-5 rounded-2xl border-2 border-slate-300 bg-slate-50 hover:shadow-md transition-shadow">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-full bg-slate-800 text-white font-bold text-xs flex items-center justify-center shadow-sm">9</span>
+                <h4 class="font-bold text-sm text-slate-800">Further Actions</h4>
+              </div>
+              <span class="w-8 h-8 rounded-lg bg-slate-200 text-slate-700 flex items-center justify-center text-sm"><i class="fa-solid fa-sliders"></i></span>
+            </div>
+            <ul class="text-xs text-slate-600 space-y-1.5 mb-4 flex-1">
+              <li class="flex items-start gap-1.5">• <span>Save data for future reference</span></li>
+              <li class="flex items-start gap-1.5">• <span>Modify inputs and re-run analysis</span></li>
+              <li class="flex items-start gap-1.5">• <span>Compare different scenarios</span></li>
+              <li class="flex items-start gap-1.5">• <span>Set water saving targets & alerts</span></li>
+            </ul>
+            <button onclick="goToStep(9)" class="w-full py-1.5 rounded-lg bg-white border border-slate-300 text-slate-700 font-bold text-xs hover:bg-slate-800 hover:text-white transition-colors">
+              Go to Step 9 →
+            </button>
+          </div>
+
         </div>
+
       </div>
     </section>
 
