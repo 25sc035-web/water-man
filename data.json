@@ -6,7 +6,12 @@
     "waterCost": 50,
     "electricityCost": 7.1,
     "chemicalCost": 151,
-    "fabricType": "Cotton"
+    "fabricType": "Cotton",
+    "freshTds": 150,
+    "freshHardness": 80,
+    "treatedTds": 650,
+    "treatedHardness": 200,
+    "treatedAvailable": 7450
   },
   "processes": [
     {

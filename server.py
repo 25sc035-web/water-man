@@ -1,6 +1,6 @@
 """
 Textile Factory Water & Cost Optimization System
-Lightweight Python Local Server with REST API Support
+Lightweight Python Local Server with HTTPS and REST API Support
 """
 
 import http.server
@@ -8,9 +8,12 @@ import socketserver
 import json
 import os
 import sys
+import ssl
 
 PORT = 5000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
+CERT_FILE = os.path.join(DIRECTORY, "cert.pem")
+KEY_FILE = os.path.join(DIRECTORY, "key.pem")
 
 class TextileOptimizerHandler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
@@ -102,10 +105,22 @@ class TextileOptimizerHandler(http.server.SimpleHTTPRequestHandler):
 
 def run_server():
     os.chdir(DIRECTORY)
+    use_ssl = os.path.exists(CERT_FILE) and os.path.exists(KEY_FILE) and ("--no-ssl" not in sys.argv)
+    
     with socketserver.TCPServer(("", PORT), TextileOptimizerHandler) as httpd:
+        if use_ssl:
+            context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+            context.load_cert_chain(certfile=CERT_FILE, keyfile=KEY_FILE)
+            httpd.socket = context.wrap_socket(httpd.socket, server_side=True)
+            protocol = "https"
+        else:
+            protocol = "http"
+
         print("=" * 65)
         print(f" Textile Water & Cost Optimizer Web Server Running")
-        print(f" Local Address: http://localhost:{PORT}")
+        print(f" Local Address: {protocol}://localhost:{PORT}")
+        if use_ssl:
+            print(f" SSL Certificate: Active ({CERT_FILE})")
         print("=" * 65)
         try:
             httpd.serve_forever()

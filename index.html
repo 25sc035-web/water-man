@@ -35,14 +35,17 @@
       </div>
 
       <!-- Quick Nav & User status -->
-      <div class="flex items-center gap-3">
-        <span id="user-header-status" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+      <div class="flex items-center gap-2 sm:gap-3">
+        <span id="user-header-status" class="hidden md:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-blue-700 border border-blue-200">
           <i class="fa-solid fa-building text-blue-500"></i> ABC Textiles
         </span>
-        <button onclick="openFlowchartModal()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-1.5 shadow-sm">
+        <button onclick="openDemoGuideModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 transition-colors flex items-center gap-1.5 shadow-sm">
+          <i class="fa-solid fa-microphone-lines text-amber-600"></i> 5-Min Demo
+        </button>
+        <button onclick="openFlowchartModal()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 transition-colors flex items-center gap-1.5 shadow-sm">
           <i class="fa-solid fa-diagram-project text-indigo-500"></i> Flowchart
         </button>
-        <button onclick="startQuickDemo()" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+        <button onclick="startQuickDemo()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 hover:bg-emerald-100 transition-colors">
           <i class="fa-solid fa-bolt mr-1"></i> Quick Demo
         </button>
       </div>
@@ -214,6 +217,51 @@
           </div>
           <h3 class="text-base font-bold text-slate-800 mb-2">4. Executive Reports</h3>
           <p class="text-xs text-slate-500 leading-relaxed">One-click audit reports ready for factory management and compliance audits.</p>
+        </div>
+      </div>
+
+      <!-- ==========================================
+           5-MINUTE LIVE DEMO & WATER BLEND OPTIMIZER SHOWCASE
+           ========================================== -->
+      <div class="mt-6 p-6 sm:p-7 rounded-3xl bg-gradient-to-br from-indigo-900 via-slate-900 to-blue-950 text-white border border-indigo-500/30 shadow-xl relative overflow-hidden">
+        <div class="absolute -right-16 -top-16 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="relative z-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
+          <div class="max-w-3xl">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-400/20 text-amber-300 text-xs font-bold mb-3 border border-amber-400/30">
+              <i class="fa-solid fa-microphone-lines text-amber-400"></i> 5-Minute Demo Outline & Water Blend Engine
+            </div>
+            <h3 class="text-xl sm:text-2xl font-black text-white tracking-tight mb-2">
+              Water Quality Blend Equation & Closed-Loop Reuse Allocation
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed mb-4">
+              Water reuse in wet textile processing is constrained by <span class="text-amber-300 font-bold">water quality (TDS & Hardness)</span>, not just hydraulic volume. The optimizer solves the blend equation to give treated water first to high-tolerance stages (Washing first, then Bleaching, then Dyeing) while calculating whether each stage is limited by <strong class="text-emerald-400">quality</strong> or <strong class="text-blue-400">supply</strong>.
+            </p>
+            <div class="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-medium">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
+                <i class="fa-solid fa-check text-emerald-400"></i> Baseline Demand: <strong>40,000 L/day</strong>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
+                <i class="fa-solid fa-recycle text-blue-400"></i> ETP Reused: <strong>7,450 L/day</strong>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
+                <i class="fa-solid fa-percent text-teal-400"></i> Headline Saving: <strong>18.6%</strong>
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
+                <i class="fa-solid fa-vial text-purple-400"></i> Washing Blended TDS: <strong>523 mg/L</strong>
+              </span>
+            </div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row lg:flex-col gap-3 w-full lg:w-auto flex-shrink-0">
+            <button onclick="openDemoGuideModal()" class="px-5 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs shadow-lg shadow-amber-500/25 flex items-center justify-center gap-2 transition-transform active:scale-95">
+              <i class="fa-solid fa-microphone-lines text-slate-950"></i>
+              <span>Launch 5-Min Pitch Guide</span>
+            </button>
+            <button onclick="loadSampleFactory()" class="px-5 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/25 flex items-center justify-center gap-2 transition-transform active:scale-95">
+              <i class="fa-solid fa-bolt text-amber-300"></i>
+              <span>Load Sample Factory & Run</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -667,7 +715,81 @@
                 <span class="absolute left-3 top-2.5 text-xs text-slate-400 font-bold">₹</span>
                 <input type="number" id="input-chem-cost" value="120" min="1" step="5" required
                   class="w-full pl-7 pr-12 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:ring-2 focus:ring-blue-500 focus:outline-none">
-                <span class="absolute right-2 top-2.5 text-[10px] text-slate-400 font-medium">/ kg</span>
+                <span class="absolute right-2.5 top-2.5 text-[10px] text-slate-400 font-medium">/ kg</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Water Quality & Treatment Benchmarks (for Blend Optimizer) -->
+          <div class="p-4 sm:p-5 rounded-2xl bg-blue-50/60 border border-blue-200/80 space-y-4">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs">
+                  <i class="fa-solid fa-flask-vial"></i>
+                </span>
+                <div>
+                  <h4 class="text-xs font-bold text-slate-900">Water Quality & ETP Effluent Inputs</h4>
+                  <p class="text-[11px] text-slate-500">Parameters used by the Water Blend Conservation Engine</p>
+                </div>
+              </div>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-100 text-blue-700">Blend Engine</span>
+            </div>
+
+            <!-- Fresh Water Parameters -->
+            <div>
+              <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-faucet text-blue-500"></i> Fresh Water Supply Quality
+              </span>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Fresh Water TDS</label>
+                  <div class="relative">
+                    <input type="number" id="input-fresh-tds" value="150" min="10" max="2000" step="5" required
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                    <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-medium">mg/L</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Fresh Water Hardness</label>
+                  <div class="relative">
+                    <input type="number" id="input-fresh-hardness" value="80" min="5" max="1000" step="5" required
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                    <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-medium">mg/L</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Treated Water Parameters -->
+            <div>
+              <span class="block text-[11px] font-bold uppercase tracking-wider text-slate-600 mb-1.5 flex items-center gap-1.5">
+                <i class="fa-solid fa-recycle text-emerald-500"></i> ETP Reclaimed / Treated Water Quality & Supply
+              </span>
+              <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Treated Effluent TDS</label>
+                  <div class="relative">
+                    <input type="number" id="input-treated-tds" value="650" min="50" max="5000" step="10" required
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                    <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-medium">mg/L</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Treated Hardness</label>
+                  <div class="relative">
+                    <input type="number" id="input-treated-hardness" value="200" min="10" max="2000" step="5" required
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                    <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-medium">mg/L</span>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Treated Water Available</label>
+                  <div class="relative">
+                    <input type="number" id="input-treated-available" value="7450" min="0" step="50" required
+                      class="w-full px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none pr-14">
+                    <span class="absolute right-2.5 top-2 text-[10px] text-slate-400 font-medium">L/day</span>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
@@ -730,12 +852,14 @@
             <table class="w-full text-left border-collapse">
               <thead>
                 <tr class="bg-slate-100/80 border-b border-slate-200 text-xs font-bold text-slate-600 uppercase">
-                  <th class="py-3 px-4">Process</th>
-                  <th class="py-3 px-4">Water Usage (L/day)</th>
-                  <th class="py-3 px-4">Electricity Cost (₹/day)</th>
-                  <th class="py-3 px-4">Chemical Cost (₹/day)</th>
-                  <th class="py-3 px-4">Other Cost (₹/day)</th>
-                  <th class="py-3 px-4 text-center">Action</th>
+                  <th class="py-3 px-3">Process</th>
+                  <th class="py-3 px-3">Water (L/d)</th>
+                  <th class="py-3 px-3">Max TDS (mg/L)</th>
+                  <th class="py-3 px-3">Max Hardness (mg/L)</th>
+                  <th class="py-3 px-3">Elec (₹/d)</th>
+                  <th class="py-3 px-3">Chem (₹/d)</th>
+                  <th class="py-3 px-3">Other (₹/d)</th>
+                  <th class="py-3 px-3 text-center">Action</th>
                 </tr>
               </thead>
               <tbody id="process-table-body">
@@ -953,7 +1077,117 @@
 
         </div>
 
-        <!-- Action Row -->
+        <!-- ==========================================
+             PER-STAGE WATER BLEND OPTIMIZATION TABLE
+             ========================================== -->
+        <div class="glass-card rounded-3xl border border-slate-200 shadow-md overflow-hidden">
+          
+          <div class="p-5 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-blue-50/70 via-indigo-50/40 to-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2 mb-1">
+                <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm shadow-md shadow-blue-500/25">
+                  <i class="fa-solid fa-calculator"></i>
+                </span>
+                <h3 class="text-base sm:text-lg font-black text-slate-900">Per-Stage Water Blend Optimization (ETP Allocation)</h3>
+              </div>
+              <p class="text-xs text-slate-500">
+                Calculated via Conservation Blend Equation · The strictest quality limit (TDS vs Hardness) wins · High-tolerance stages prioritized first
+              </p>
+            </div>
+            
+            <div class="flex items-center gap-2">
+              <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-200">
+                <i class="fa-solid fa-circle-check text-blue-600 mr-1"></i> Blend Engine Active
+              </span>
+              <button onclick="openDemoGuideModal()" class="px-3 py-1 rounded-lg text-xs font-semibold bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 shadow-sm transition-colors">
+                <i class="fa-solid fa-circle-question text-amber-500 mr-1"></i> Talking Points
+              </button>
+            </div>
+          </div>
+
+          <!-- Quality Benchmarks Quick Strip -->
+          <div class="bg-slate-50 px-5 py-3 border-b border-slate-200/80 flex flex-wrap items-center justify-between gap-4 text-xs text-slate-600">
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-faucet text-blue-500"></i>
+              <span>Fresh Baseline: <strong class="text-slate-800" id="blend-strip-fresh">150 mg/L TDS · 80 mg/L Hardness</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-recycle text-emerald-500"></i>
+              <span>ETP Effluent: <strong class="text-slate-800" id="blend-strip-treated">650 mg/L TDS · 200 mg/L Hardness · 7,450 L/d</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-vial text-purple-500"></i>
+              <span>Washing Stage TDS: <strong class="text-purple-700 font-bold" id="blend-strip-washing-tds">523 mg/L</strong> (Limit: 700 mg/L)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <i class="fa-solid fa-boxes-stacked text-amber-500"></i>
+              <span>Unused Treated Water: <strong class="text-emerald-700 font-bold" id="blend-strip-unused">0 L/day</strong></span>
+            </div>
+          </div>
+
+          <!-- The Table -->
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-100/90 border-b border-slate-200 text-[11px] font-bold text-slate-600 uppercase">
+                  <th class="py-3 px-4">Stage / Process</th>
+                  <th class="py-3 px-4 text-right">Demand (L/d)</th>
+                  <th class="py-3 px-4 text-right">Fresh Water (L/d)</th>
+                  <th class="py-3 px-4 text-right">Recycled Blend (L/d)</th>
+                  <th class="py-3 px-4 text-right">Blended TDS</th>
+                  <th class="py-3 px-4 text-right">Blended Hardness</th>
+                  <th class="py-3 px-4 text-center">Max Quality Cap</th>
+                  <th class="py-3 px-4 text-center">Status / Bottleneck</th>
+                  <th class="py-3 px-4 text-right">Stage Saving</th>
+                </tr>
+              </thead>
+              <tbody id="blend-optimization-table-body">
+                <!-- Dynamically populated by app.js -->
+              </tbody>
+              <tfoot class="bg-slate-50/90 border-t-2 border-slate-300 font-bold text-slate-800">
+                <tr>
+                  <td class="py-3.5 px-4 font-black text-slate-900">Total Factory Balance</td>
+                  <td class="py-3.5 px-4 text-right text-slate-900" id="blend-total-demand">40,000 L/d</td>
+                  <td class="py-3.5 px-4 text-right text-blue-700 font-black" id="blend-total-fresh">32,550 L/d</td>
+                  <td class="py-3.5 px-4 text-right text-emerald-700 font-black" id="blend-total-recycled">7,450 L/d</td>
+                  <td class="py-3.5 px-4 text-right text-slate-600">-</td>
+                  <td class="py-3.5 px-4 text-right text-slate-600">-</td>
+                  <td class="py-3.5 px-4 text-center text-slate-600">Full Allocation</td>
+                  <td class="py-3.5 px-4 text-center">
+                    <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                      Balanced
+                    </span>
+                  </td>
+                  <td class="py-3.5 px-4 text-right text-emerald-700 font-black text-sm" id="blend-total-saving-pct">18.6%</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <!-- Mathematical Blend Equation Explainer Footer -->
+          <div class="p-4 sm:p-5 bg-gradient-to-r from-slate-900 via-slate-950 to-blue-950 text-white border-t border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+            <div class="space-y-1 max-w-3xl">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider">Governing Blend Equation:</span>
+                <span class="px-2 py-0.5 rounded bg-white/10 text-slate-200 text-[11px] font-mono">
+                  C_blend = (V_fresh · C_fresh + V_treated · C_treated) / V_demand
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-300">
+                <strong>Allocation Rule:</strong> Stages tolerating highest contaminants receive treated effluent first (<span class="text-emerald-400">Washing</span> → <span class="text-blue-300">Bleaching</span> → <span class="text-purple-300">Dyeing</span>). The strictest limit between TDS and Hardness dictates the maximum allowable fraction.
+              </p>
+            </div>
+            <div class="flex items-center gap-3 flex-shrink-0 text-xs">
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                <span class="w-2 h-2 rounded-full bg-blue-400"></span> Supply Limited
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded bg-amber-500/20 text-amber-300 border border-amber-400/30">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span> Quality Limited
+              </span>
+            </div>
+          </div>
+
+        </div>
         <div class="flex items-center justify-between pt-2">
           <button onclick="goToStep(4)" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900">
             <i class="fa-solid fa-arrow-left mr-1"></i> Edit Process Inputs
@@ -1334,6 +1568,187 @@
     </div>
   </div>
 
+  <!-- 5-Minute Presentation Pitch & Demo Guide Modal -->
+  <div id="demo-guide-modal" class="fixed inset-0 z-50 bg-slate-950/85 backdrop-blur-md hidden flex items-center justify-center p-4 sm:p-6" onclick="closeDemoGuideModal()">
+    <div class="relative bg-white rounded-3xl max-w-4xl w-full max-h-[92vh] overflow-hidden shadow-2xl flex flex-col border border-slate-200" onclick="event.stopPropagation()">
+      
+      <!-- Modal Header -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 bg-gradient-to-r from-amber-500/10 via-blue-500/10 to-transparent flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-md shadow-amber-500/25">
+            <i class="fa-solid fa-microphone-lines"></i>
+          </div>
+          <div>
+            <h3 class="text-base sm:text-lg font-black text-slate-900 leading-tight">5-Minute Executive Demo Pitch & Blend Model</h3>
+            <p class="text-xs text-slate-500">Structured Speaker Script · Timed talking points · Interactive live demo triggers</p>
+          </div>
+        </div>
+        <button onclick="closeDemoGuideModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Toolbar -->
+      <div class="bg-slate-50 px-5 py-2.5 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+        <span class="text-slate-500 font-medium">Quick Presenter Triggers:</span>
+        <div class="flex items-center gap-2">
+          <button onclick="loadSampleFactory(); closeDemoGuideModal();" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-colors">
+            <i class="fa-solid fa-bolt text-amber-300"></i> Load Sample Factory (40k L/d)
+          </button>
+          <button onclick="goToStep(6); closeDemoGuideModal();" class="px-3 py-1.5 rounded-lg bg-white hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-300 shadow-sm transition-colors">
+            <i class="fa-solid fa-chart-pie text-blue-500"></i> Jump to Dashboard
+          </button>
+        </div>
+      </div>
+
+      <!-- Modal Body (The 6 Structured Talking Points) -->
+      <div class="overflow-y-auto p-5 sm:p-6 space-y-4">
+        
+        <!-- Point 1: Problem (30 s) -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-red-100 text-red-700 font-bold text-xs flex items-center justify-center">1</span>
+              <h4 class="font-black text-slate-800 text-sm">The Problem: High Water Intensity & Effluent Discharge</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-red-50 text-red-700 border border-red-200">
+              0:00 - 0:30 (30 sec)
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <strong class="text-slate-900">Talking Script:</strong> "Textile wet-processing is one of the most water-demanding industries in the world. In our baseline cotton mill, production of 1,000 kg of fabric consumes <strong class="text-red-600">40,000 litres of water every single day</strong> across desizing, dyeing, rinsing, and finishing. Over 90% of this water ends up as hazardous effluent, escalating municipal freshwater bills (₹50 per kL) and risking severe regulatory penalties."
+          </p>
+        </div>
+
+        <!-- Point 2: Solution Overview (30 s) -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-700 font-bold text-xs flex items-center justify-center">2</span>
+              <h4 class="font-black text-slate-800 text-sm">Solution Overview: Closed-Loop Telemetry & Recycled Blend</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-50 text-blue-700 border border-blue-200">
+              0:30 - 1:00 (30 sec)
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mb-2">
+            <strong class="text-slate-900">Talking Script:</strong> "Our platform creates a real-time, closed-loop telemetry and blending architecture: <span class="text-blue-700 font-semibold">Flow meters</span> at each wet process feed continuous data to a <span class="text-blue-700 font-semibold">microcontroller unit</span>. Effluent passes to the <span class="text-blue-700 font-semibold">Effluent Treatment Plant (ETP)</span>, which stores clarified, tertiary-treated water in a buffer tank before feeding it back into the freshwater header line via automated ratio control valves."
+          </p>
+          <div class="flex items-center gap-2 text-[11px] text-slate-500">
+            <i class="fa-solid fa-arrow-right text-blue-500"></i>
+            <span>Architecture: Flow Meters ➔ Microcontroller ➔ ETP ➔ Treated Tank ➔ Ratio Blending ➔ Processes</span>
+          </div>
+        </div>
+
+        <!-- Point 3: Live Demo (2 min) -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 font-bold text-xs flex items-center justify-center">3</span>
+              <h4 class="font-black text-slate-800 text-sm">Live Demo: 6-Stage Engine & Dashboard</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              1:00 - 3:00 (2 min)
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed mb-3">
+            <strong class="text-slate-900">Talking Script:</strong> "Watch how simple this is for a plant manager: Click <strong class="text-emerald-700">'Load sample factory'</strong>. We configure 40,000 L/day total demand with 7,450 L/day of treated water available from our ETP. Run the 6-stage optimization engine. Instantly, our Results Dashboard and Per-Stage Water Blend Table reveal exactly how every drop is balanced."
+          </p>
+          <div class="flex items-center gap-2">
+            <button onclick="loadSampleFactory(); closeDemoGuideModal();" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-play"></i> Trigger Live Demo Now
+            </button>
+            <span class="text-[11px] text-slate-400">Loads exact 40,000 L/d factory data and navigates to Step 6</span>
+          </div>
+        </div>
+
+        <!-- Point 4: The Key Insight (1 min) -->
+        <div class="p-4 rounded-2xl border-2 border-indigo-200 bg-indigo-50/40">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-indigo-600 text-white font-bold text-xs flex items-center justify-center">4</span>
+              <h4 class="font-black text-indigo-950 text-sm">The Key Insight: Quality Constraints (TDS & Hardness), Not Just Volume</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-100 text-indigo-800 border border-indigo-200">
+              3:00 - 4:00 (1 min)
+            </span>
+          </div>
+          <p class="text-xs text-indigo-950 leading-relaxed mb-2">
+            <strong class="text-slate-900">Talking Script:</strong> "Here is our core engineering innovation: in real textile mills, <strong class="text-indigo-700">water reuse is limited by chemistry, NOT just hydraulic volume</strong>. High TDS precipitates dyes and causes shade variation, while hardness causes calcium soap scaling. The optimizer uses the blend conservation equation:"
+          </p>
+          <div class="p-2.5 rounded-lg bg-white border border-indigo-200 font-mono text-center text-xs text-slate-800 font-bold mb-2">
+            C_blend = (V_fresh · C_fresh + V_treated · C_treated) / V_demand
+          </div>
+          <p class="text-xs text-indigo-900 leading-relaxed">
+            "Notice how the algorithm gives treated water first to <strong class="text-slate-900">Washing & Rinsing</strong> (which tolerates 700 mg/L TDS). All 7,450 L goes to washing, yielding a safe blended TDS of <strong class="text-emerald-700">523 mg/L</strong>. Dyeing is flagged as <span class="px-1.5 py-0.5 rounded bg-amber-100 text-amber-800 font-bold">limitedBy: Quality</span>, while Bleaching is flagged as <span class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">limitedBy: Supply</span>—directly telling the engineer where to invest in RO capacity!"
+          </p>
+        </div>
+
+        <!-- Point 5: Impact (45 s) -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-teal-100 text-teal-700 font-bold text-xs flex items-center justify-center">5</span>
+              <h4 class="font-black text-slate-800 text-sm">Financial & Environmental Impact: 18.6% Reduction & Immediate ROI</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-teal-50 text-teal-700 border border-teal-200">
+              4:00 - 4:45 (45 sec)
+            </span>
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs mb-2">
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Daily Water Cut</span>
+              <strong class="text-blue-600 text-sm">7,450 L/day</strong>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Overall Saving</span>
+              <strong class="text-emerald-600 text-sm">18.6%</strong>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Monthly Net Saving</span>
+              <strong class="text-slate-900 text-sm">₹9,685</strong>
+            </div>
+            <div class="p-2 rounded-lg bg-white border border-slate-200">
+              <span class="text-slate-400 block text-[10px]">Annual Net Saving</span>
+              <strong class="text-emerald-700 text-sm">₹1,16,220</strong>
+            </div>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <strong class="text-slate-900">Talking Script:</strong> "At ₹50/kL freshwater cost, this saves ₹373 every single working day, adding up to <strong class="text-emerald-700">₹1,16,220 net cost reduction per year</strong>. With automated motorized valve manifolds costing ~₹80,000, the capital payback is achieved in under 9 months."
+          </p>
+        </div>
+
+        <!-- Point 6: Next Steps & Credits (15 s) -->
+        <div class="p-4 rounded-2xl border border-slate-200 bg-slate-50/50 hover:bg-slate-50 transition-colors">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-700 font-bold text-xs flex items-center justify-center">6</span>
+              <h4 class="font-black text-slate-800 text-sm">Next Steps & Stack Credits</h4>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-50 text-purple-700 border border-purple-200">
+              4:45 - 5:00 (15 sec)
+            </span>
+          </div>
+          <p class="text-xs text-slate-600 leading-relaxed">
+            <strong class="text-slate-900">Talking Script:</strong> "Upcoming milestones include direct IoT RS-485 Modbus sensor streaming for live TDS/hardness monitoring, automated Zero Liquid Discharge (ZLD) closed-loop mode, and ERP export. Built with open-source technologies including Tailwind CSS, Chart.js, and FontAwesome."
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 border-t border-slate-200 bg-slate-50 flex items-center justify-between">
+        <span class="text-xs text-slate-500">Ready to present? Use keyboard <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded text-[10px]">Esc</kbd> or click Close to return.</span>
+        <button onclick="closeDemoGuideModal()" class="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs">
+          Close Guide
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Water Blend Optimization Engine -->
+  <script src="blend-optimizer.js"></script>
   <!-- Main JavaScript Logic -->
   <script src="app.js"></script>
 </body>

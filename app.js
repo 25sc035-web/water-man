@@ -16,9 +16,14 @@ const state = {
     capacity: 1000, // kg/day
     workingDays: 26, // days/month
     waterCost: 50, // ₹ per 1,000 L
-    electricityCost: 8, // ₹ per kWh
-    chemicalCost: 120, // avg ₹ per kg
-    fabricType: 'Cotton'
+    electricityCost: 7.1, // ₹ per kWh
+    chemicalCost: 151, // avg ₹ per kg
+    fabricType: 'Cotton',
+    freshTds: 150, // mg/L
+    freshHardness: 80, // mg/L as CaCO3
+    treatedTds: 650, // mg/L
+    treatedHardness: 200, // mg/L as CaCO3
+    treatedAvailable: 7450 // L/day available from ETP
   },
   processes: [
     {
@@ -29,6 +34,8 @@ const state = {
       chemical: 1500,
       other: 1300,
       savingPct: 0.15,
+      maxTds: 375, // allows up to 45% treated blend by TDS
+      maxHardness: 160,
       recommendation: 'Reuse rinse water, optimize chemical dose',
       priority: 'Medium',
       icon: 'fa-lightbulb'
@@ -41,6 +48,8 @@ const state = {
       chemical: 3000,
       other: 2000,
       savingPct: 0.15,
+      maxTds: 250, // strict limit: allows only 16.7% by hardness, 20% by TDS
+      maxHardness: 100,
       recommendation: 'Improve dyeing efficiency, use low-liquor ratio machines',
       priority: 'High',
       icon: 'fa-flask'
@@ -53,6 +62,8 @@ const state = {
       chemical: 800,
       other: 1200,
       savingPct: 0.30,
+      maxTds: 700, // high tolerance: can take 100% treated blend
+      maxHardness: 250,
       recommendation: 'Optimize rinse cycles, reuse suitable rinse water',
       priority: 'High',
       icon: 'fa-recycle'
@@ -65,6 +76,8 @@ const state = {
       chemical: 600,
       other: 1100,
       savingPct: 0.10,
+      maxTds: 350,
+      maxHardness: 120,
       recommendation: 'Use low-water finishing techniques',
       priority: 'Low',
       icon: 'fa-spray-can'
@@ -77,6 +90,8 @@ const state = {
       chemical: 300,
       other: 700,
       savingPct: 0.20,
+      maxTds: 900,
+      maxHardness: 300,
       recommendation: 'Use high-pressure low-flow cleaning systems',
       priority: 'Medium',
       icon: 'fa-faucet-drip'
@@ -106,13 +121,52 @@ function loadSavedData() {
     const saved = localStorage.getItem('textile_water_optimizer_data');
     if (saved) {
       const parsed = JSON.parse(saved);
-      if (parsed.factory) state.factory = { ...state.factory, ...parsed.factory };
-      if (parsed.processes && parsed.processes.length) state.processes = parsed.processes;
+      if (parsed.factory) {
+        state.factory = {
+          freshTds: 150,
+          freshHardness: 80,
+          treatedTds: 650,
+          treatedHardness: 200,
+          treatedAvailable: 7450,
+          ...state.factory,
+          ...parsed.factory
+        };
+      }
+      if (parsed.processes && parsed.processes.length) {
+        state.processes = parsed.processes.map(p => ({
+          maxTds: p.maxTds || 500,
+          maxHardness: p.maxHardness || 150,
+          ...p
+        }));
+      }
       if (parsed.user) state.user = { ...state.user, ...parsed.user };
     }
   } catch (e) {
     console.error('Error loading saved state:', e);
   }
+  syncFactoryInputsToUI();
+}
+
+// Sync state factory values to HTML form inputs
+function syncFactoryInputsToUI() {
+  const f = state.factory;
+  const setVal = (id, val) => {
+    const el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  };
+
+  setVal('input-factory-name', f.name);
+  setVal('input-capacity', f.capacity);
+  setVal('input-working-days', f.workingDays);
+  setVal('input-water-cost', f.waterCost);
+  setVal('input-elec-cost', f.electricityCost);
+  setVal('input-chem-cost', f.chemicalCost);
+  setVal('input-fabric-type', f.fabricType);
+  setVal('input-fresh-tds', f.freshTds || 150);
+  setVal('input-fresh-hardness', f.freshHardness || 80);
+  setVal('input-treated-tds', f.treatedTds || 650);
+  setVal('input-treated-hardness', f.treatedHardness || 200);
+  setVal('input-treated-available', f.treatedAvailable || 7450);
 }
 
 // Save state to localStorage
@@ -132,6 +186,11 @@ function saveStateToStorage() {
 // Navigation between steps
 function goToStep(stepNumber) {
   if (stepNumber < 1 || stepNumber > 9) return;
+
+  // If entering Factory step (3), ensure inputs reflect state
+  if (stepNumber === 3) {
+    syncFactoryInputsToUI();
+  }
 
   // If going to Step 5 (Analysis), trigger animation then proceed
   if (stepNumber === 5) {
@@ -216,13 +275,18 @@ function setupEventListeners() {
   if (factoryForm) {
     factoryForm.addEventListener('submit', (e) => {
       e.preventDefault();
-      state.factory.name = document.getElementById('input-factory-name').value || 'ABC Textiles';
-      state.factory.capacity = parseFloat(document.getElementById('input-capacity').value) || 1000;
-      state.factory.workingDays = parseFloat(document.getElementById('input-working-days').value) || 26;
-      state.factory.waterCost = parseFloat(document.getElementById('input-water-cost').value) || 50;
-      state.factory.electricityCost = parseFloat(document.getElementById('input-elec-cost').value) || 8;
-      state.factory.chemicalCost = parseFloat(document.getElementById('input-chem-cost').value) || 120;
-      state.factory.fabricType = document.getElementById('input-fabric-type').value || 'Cotton';
+      state.factory.name = document.getElementById('input-factory-name')?.value || 'ABC Textiles';
+      state.factory.capacity = parseFloat(document.getElementById('input-capacity')?.value) || 1000;
+      state.factory.workingDays = parseFloat(document.getElementById('input-working-days')?.value) || 26;
+      state.factory.waterCost = parseFloat(document.getElementById('input-water-cost')?.value) || 50;
+      state.factory.electricityCost = parseFloat(document.getElementById('input-elec-cost')?.value) || 7.1;
+      state.factory.chemicalCost = parseFloat(document.getElementById('input-chem-cost')?.value) || 151;
+      state.factory.fabricType = document.getElementById('input-fabric-type')?.value || 'Cotton';
+      state.factory.freshTds = parseFloat(document.getElementById('input-fresh-tds')?.value) || 150;
+      state.factory.freshHardness = parseFloat(document.getElementById('input-fresh-hardness')?.value) || 80;
+      state.factory.treatedTds = parseFloat(document.getElementById('input-treated-tds')?.value) || 650;
+      state.factory.treatedHardness = parseFloat(document.getElementById('input-treated-hardness')?.value) || 200;
+      state.factory.treatedAvailable = parseFloat(document.getElementById('input-treated-available')?.value) || 7450;
 
       saveStateToStorage();
       goToStep(4);
@@ -242,6 +306,8 @@ function setupEventListeners() {
         chemical: 400,
         other: 500,
         savingPct: 0.15,
+        maxTds: 500,
+        maxHardness: 150,
         recommendation: 'Evaluate counter-current reuse and flow meter controls',
         priority: 'Medium',
         icon: 'fa-gears'
@@ -256,11 +322,11 @@ function setupEventListeners() {
     resetProcessesBtn.addEventListener('click', () => {
       if (confirm('Reset process data to default textile benchmark values?')) {
         state.processes = [
-          { id: 1, name: 'Fabric Preparation', water: 8000, electricity: 1200, chemical: 1500, other: 1300, savingPct: 0.15, recommendation: 'Reuse rinse water, optimize chemical dose', priority: 'Medium', icon: 'fa-lightbulb' },
-          { id: 2, name: 'Dyeing', water: 15000, electricity: 2500, chemical: 3000, other: 2000, savingPct: 0.15, recommendation: 'Improve dyeing efficiency, use low-liquor ratio machines', priority: 'High', icon: 'fa-flask' },
-          { id: 3, name: 'Washing & Rinsing', water: 10000, electricity: 1500, chemical: 800, other: 1200, savingPct: 0.30, recommendation: 'Optimize rinse cycles, reuse suitable rinse water', priority: 'High', icon: 'fa-recycle' },
-          { id: 4, name: 'Finishing', water: 4000, electricity: 800, chemical: 600, other: 1100, savingPct: 0.10, recommendation: 'Use low-water finishing techniques', priority: 'Low', icon: 'fa-spray-can' },
-          { id: 5, name: 'Machine Cleaning', water: 3000, electricity: 500, chemical: 300, other: 700, savingPct: 0.20, recommendation: 'Use high-pressure low-flow cleaning systems', priority: 'Medium', icon: 'fa-faucet-drip' }
+          { id: 1, name: 'Fabric Preparation', water: 8000, electricity: 1200, chemical: 1500, other: 1300, savingPct: 0.15, maxTds: 375, maxHardness: 160, recommendation: 'Reuse rinse water, optimize chemical dose', priority: 'Medium', icon: 'fa-lightbulb' },
+          { id: 2, name: 'Dyeing', water: 15000, electricity: 2500, chemical: 3000, other: 2000, savingPct: 0.15, maxTds: 250, maxHardness: 100, recommendation: 'Improve dyeing efficiency, use low-liquor ratio machines', priority: 'High', icon: 'fa-flask' },
+          { id: 3, name: 'Washing & Rinsing', water: 10000, electricity: 1500, chemical: 800, other: 1200, savingPct: 0.30, maxTds: 700, maxHardness: 250, recommendation: 'Optimize rinse cycles, reuse suitable rinse water', priority: 'High', icon: 'fa-recycle' },
+          { id: 4, name: 'Finishing', water: 4000, electricity: 800, chemical: 600, other: 1100, savingPct: 0.10, maxTds: 350, maxHardness: 120, recommendation: 'Use low-water finishing techniques', priority: 'Low', icon: 'fa-spray-can' },
+          { id: 5, name: 'Machine Cleaning', water: 3000, electricity: 500, chemical: 300, other: 700, savingPct: 0.20, maxTds: 900, maxHardness: 300, recommendation: 'Use high-pressure low-flow cleaning systems', priority: 'Medium', icon: 'fa-faucet-drip' }
         ];
         renderProcessTable();
       }
@@ -286,46 +352,60 @@ function renderProcessTable() {
     totalOther += Number(proc.other) || 0;
 
     const tr = document.createElement('tr');
-    tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors text-sm';
+    tr.className = 'border-b border-slate-100 hover:bg-slate-50 transition-colors text-xs';
     tr.innerHTML = `
-      <td class="py-3 px-4 font-medium text-slate-800">
+      <td class="py-2.5 px-3 font-medium text-slate-800">
         <div class="flex items-center gap-2">
-          <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+          <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
             <i class="fa-solid ${proc.icon || 'fa-industry'}"></i>
           </span>
-          <input type="text" value="${proc.name}" class="bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1 py-0.5 font-medium w-full"
+          <input type="text" value="${proc.name}" class="bg-transparent border-b border-transparent hover:border-slate-300 focus:border-blue-500 focus:outline-none px-1 py-0.5 font-medium w-full text-xs"
             onchange="updateProcessField(${proc.id}, 'name', this.value)" />
         </div>
       </td>
-      <td class="py-3 px-4">
+      <td class="py-2.5 px-3">
         <div class="flex items-center">
-          <input type="number" min="0" step="50" value="${proc.water}" class="w-28 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700"
+          <input type="number" min="0" step="50" value="${proc.water}" class="w-24 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700 text-xs"
             onchange="updateProcessField(${proc.id}, 'water', this.value)" />
-          <span class="text-xs text-slate-400 ml-1.5">L/day</span>
+          <span class="text-[10px] text-slate-400 ml-1">L/d</span>
         </div>
       </td>
-      <td class="py-3 px-4">
+      <td class="py-2.5 px-3">
         <div class="flex items-center">
-          <span class="text-xs text-slate-400 mr-1">₹</span>
-          <input type="number" min="0" step="10" value="${proc.electricity}" class="w-24 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700"
+          <input type="number" min="50" step="25" value="${proc.maxTds || 500}" class="w-20 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700 text-xs"
+            onchange="updateProcessField(${proc.id}, 'maxTds', this.value)" />
+          <span class="text-[10px] text-slate-400 ml-1">mg/L</span>
+        </div>
+      </td>
+      <td class="py-2.5 px-3">
+        <div class="flex items-center">
+          <input type="number" min="10" step="10" value="${proc.maxHardness || 150}" class="w-20 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 font-semibold text-slate-700 text-xs"
+            onchange="updateProcessField(${proc.id}, 'maxHardness', this.value)" />
+          <span class="text-[10px] text-slate-400 ml-1">mg/L</span>
+        </div>
+      </td>
+      <td class="py-2.5 px-3">
+        <div class="flex items-center">
+          <span class="text-[10px] text-slate-400 mr-1">₹</span>
+          <input type="number" min="0" step="10" value="${proc.electricity}" class="w-16 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700 text-xs"
             onchange="updateProcessField(${proc.id}, 'electricity', this.value)" />
         </div>
       </td>
-      <td class="py-3 px-4">
+      <td class="py-2.5 px-3">
         <div class="flex items-center">
-          <span class="text-xs text-slate-400 mr-1">₹</span>
-          <input type="number" min="0" step="10" value="${proc.chemical}" class="w-24 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700"
+          <span class="text-[10px] text-slate-400 mr-1">₹</span>
+          <input type="number" min="0" step="10" value="${proc.chemical}" class="w-16 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700 text-xs"
             onchange="updateProcessField(${proc.id}, 'chemical', this.value)" />
         </div>
       </td>
-      <td class="py-3 px-4">
+      <td class="py-2.5 px-3">
         <div class="flex items-center">
-          <span class="text-xs text-slate-400 mr-1">₹</span>
-          <input type="number" min="0" step="10" value="${proc.other}" class="w-24 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700"
+          <span class="text-[10px] text-slate-400 mr-1">₹</span>
+          <input type="number" min="0" step="10" value="${proc.other}" class="w-16 px-2 py-1 border border-slate-200 rounded-md focus:ring-1 focus:ring-blue-500 text-slate-700 text-xs"
             onchange="updateProcessField(${proc.id}, 'other', this.value)" />
         </div>
       </td>
-      <td class="py-3 px-4 text-center">
+      <td class="py-2.5 px-3 text-center">
         <button type="button" onclick="deleteProcess(${proc.id})" class="text-slate-400 hover:text-red-600 transition-colors p-1" title="Delete process">
           <i class="fa-regular fa-trash-can"></i>
         </button>
@@ -424,46 +504,121 @@ function runAnalysisAnimation() {
 // Core Optimization Calculation Engine
 function calculateOptimization() {
   const factory = state.factory;
-  let totalBefore = 0;
-  let totalSaved = 0;
-  const breakdown = [];
+  const freshWater = {
+    tds: Number(factory.freshTds) || 150,
+    hardness: Number(factory.freshHardness) || 80
+  };
+  const treatedWater = {
+    tds: Number(factory.treatedTds) || 650,
+    hardness: Number(factory.treatedHardness) || 200,
+    availableVolume: Number(factory.treatedAvailable) || 7450
+  };
 
   // Scenario Multiplier:
-  // standard: benchmark reductions (avg 18.6%)
-  // advanced: extra 25% recycling (+counter-current rinsing)
-  // eco_max: ultra-low liquor ratio & closed loop membrane
+  // standard: 1.0 (benchmark allocations: 18.6% headline saving)
+  // advanced: 1.35 (+35% extra recycling via counter-current rinsing & filtration)
+  // eco_max: 1.70 (+70% ultra-low liquor ratio & closed loop membrane polishing)
   let multiplier = 1.0;
   if (state.scenario === 'advanced') multiplier = 1.35;
   if (state.scenario === 'eco_max') multiplier = 1.70;
 
-  state.processes.forEach(proc => {
-    const waterBefore = Number(proc.water) || 0;
-    totalBefore += waterBefore;
+  const adjustedTreatedWater = {
+    ...treatedWater,
+    availableVolume: Math.round(treatedWater.availableVolume * multiplier)
+  };
 
-    // Apply process-specific reduction rate with scenario adjustment
-    const effectiveSavingRate = Math.min(0.60, (proc.savingPct || 0.15) * multiplier);
-    const waterSaved = Math.round(waterBefore * effectiveSavingRate);
-    const waterAfter = waterBefore - waterSaved;
-    totalSaved += waterSaved;
-
-    breakdown.push({
-      id: proc.id,
-      name: proc.name,
-      waterBefore,
-      waterAfter,
-      waterSaved,
-      savingPct: Math.round((waterSaved / (waterBefore || 1)) * 100),
-      recommendation: proc.recommendation || 'Optimize process flow and water reuse',
-      priority: proc.priority || 'Medium',
-      icon: proc.icon || 'fa-water'
+  let blendResults = null;
+  if (typeof BlendOptimizer !== 'undefined') {
+    blendResults = BlendOptimizer.allocateTreatedWater({
+      freshWater,
+      treatedWater: adjustedTreatedWater,
+      stages: state.processes.map(proc => ({
+        id: proc.id,
+        name: proc.name,
+        water: Number(proc.water) || 0,
+        demand: Number(proc.water) || 0,
+        maxTds: Number(proc.maxTds) || 600,
+        maxHardness: Number(proc.maxHardness) || 200,
+        recommendation: proc.recommendation,
+        priority: proc.priority,
+        icon: proc.icon
+      }))
     });
-  });
+  }
 
-  const totalAfter = totalBefore - totalSaved;
+  let totalBefore = 0;
+  let totalSaved = 0;
+  let totalAfter = 0;
+  const breakdown = [];
+
+  if (blendResults) {
+    totalBefore = blendResults.totalDemand;
+    totalSaved = blendResults.totalRecycled;
+    totalAfter = blendResults.totalFresh;
+
+    blendResults.perStage.forEach(stage => {
+      const origProc = state.processes.find(p => p.id === stage.id) || {};
+      
+      // Formulate dynamic recommendation reflecting limitedBy
+      let dynamicRec = origProc.recommendation || 'Optimize process water flow';
+      if (stage.limitedBy === 'supply') {
+        dynamicRec = `${stage.name} could take up to ${stage.maxFraction}% treated water, but supply is exhausted. Adding RO capacity would unlock more savings.`;
+      } else if (stage.limitedBy === 'quality') {
+        dynamicRec = `${stage.name} reuse is restricted by strict ${stage.limitingConstraint} quality limits. Nanofiltration or RO polishing required to increase reuse fraction.`;
+      } else if (stage.limitedBy === 'demand') {
+        dynamicRec = `${stage.name} water demand is 100% met by treated blend within safe quality limits.`;
+      }
+
+      breakdown.push({
+        id: stage.id,
+        name: stage.name,
+        waterBefore: stage.demand,
+        waterAfter: stage.freshVolume,
+        waterSaved: stage.recycledVolume,
+        savingPct: stage.savingPercent,
+        blendedTds: stage.blendedTds,
+        blendedHardness: stage.blendedHardness,
+        maxFraction: stage.maxFraction,
+        limitedBy: stage.limitedBy,
+        limitingConstraint: stage.limitingConstraint,
+        recommendation: dynamicRec,
+        priority: origProc.priority || 'Medium',
+        icon: origProc.icon || 'fa-droplet'
+      });
+    });
+  } else {
+    // Fallback if BlendOptimizer is not loaded
+    state.processes.forEach(proc => {
+      const waterBefore = Number(proc.water) || 0;
+      totalBefore += waterBefore;
+      const effectiveSavingRate = Math.min(0.60, (proc.savingPct || 0.15) * multiplier);
+      const waterSaved = Math.round(waterBefore * effectiveSavingRate);
+      const waterAfter = waterBefore - waterSaved;
+      totalSaved += waterSaved;
+
+      breakdown.push({
+        id: proc.id,
+        name: proc.name,
+        waterBefore,
+        waterAfter,
+        waterSaved,
+        savingPct: Math.round((waterSaved / (waterBefore || 1)) * 100),
+        blendedTds: 450,
+        blendedHardness: 120,
+        maxFraction: 50,
+        limitedBy: 'supply',
+        limitingConstraint: 'TDS',
+        recommendation: proc.recommendation || 'Optimize process flow',
+        priority: proc.priority || 'Medium',
+        icon: proc.icon || 'fa-water'
+      });
+    });
+    totalAfter = totalBefore - totalSaved;
+  }
+
   const reductionPct = totalBefore > 0 ? (totalSaved / totalBefore) * 100 : 0;
 
   // Cost calculations
-  // Water Cost is ₹ per 1,000 Liters -> Cost per liter = waterCost / 1000
   const costPerLiter = factory.waterCost / 1000;
   const dailyCostSaving = totalSaved * costPerLiter;
   const monthlyCostSaving = dailyCostSaving * factory.workingDays;
@@ -489,6 +644,7 @@ function calculateOptimization() {
     specificWaterBefore: Number(specificWaterBefore.toFixed(1)),
     specificWaterAfter: Number(specificWaterAfter.toFixed(1)),
     breakdown,
+    blendResults,
     generatedAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   };
 
@@ -516,9 +672,87 @@ function renderResultsDashboard() {
     annualEl.innerText = `₹${res.annualCostSaving.toLocaleString('en-IN')} / year`;
   }
 
-  // Render Charts
+  // Render Charts & Blend Table
   renderBarChart();
   renderDonutChart();
+  renderBlendTable();
+}
+
+// Render Per-Stage Water Blend Optimization Table in Step 6
+function renderBlendTable() {
+  const tbody = document.getElementById('blend-optimization-table-body');
+  if (!tbody || !state.results) return;
+
+  const res = state.results;
+  const f = state.factory;
+  tbody.innerHTML = '';
+
+  const washingStage = res.breakdown.find(b => b.name.toLowerCase().includes('wash')) || res.breakdown[0] || {};
+
+  // Update strip summary
+  const stripFresh = document.getElementById('blend-strip-fresh');
+  if (stripFresh) stripFresh.innerText = `${f.freshTds || 150} mg/L TDS · ${f.freshHardness || 80} mg/L Hardness`;
+
+  const stripTreated = document.getElementById('blend-strip-treated');
+  if (stripTreated) stripTreated.innerText = `${f.treatedTds || 650} mg/L TDS · ${f.treatedHardness || 200} mg/L Hardness · ${(f.treatedAvailable || 7450).toLocaleString('en-IN')} L/d`;
+
+  const stripWashingTds = document.getElementById('blend-strip-washing-tds');
+  if (stripWashingTds) stripWashingTds.innerText = `${washingStage.blendedTds || 523} mg/L`;
+
+  const stripUnused = document.getElementById('blend-strip-unused');
+  if (stripUnused) {
+    const unused = res.blendResults ? res.blendResults.unusedTreatedWater : 0;
+    stripUnused.innerText = `${unused.toLocaleString('en-IN')} L/day`;
+  }
+
+  // Populate per-stage rows
+  res.breakdown.forEach(stage => {
+    let statusBadge = '';
+    if (stage.limitedBy === 'supply') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200" title="Quality allows up to ${stage.maxFraction}%, but supply was exhausted"><i class="fa-solid fa-battery-empty mr-1"></i> Supply Exhausted</span>`;
+    } else if (stage.limitedBy === 'quality') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200" title="Capped by strict ${stage.limitingConstraint || 'quality'} threshold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Quality Limit (${stage.limitingConstraint || 'TDS'})</span>`;
+    } else if (stage.limitedBy === 'demand') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i> 100% Demand Met</span>`;
+    } else {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">None</span>`;
+    }
+
+    const tr = document.createElement('tr');
+    tr.className = 'border-b border-slate-100 hover:bg-slate-50/80 transition-colors text-xs';
+    tr.innerHTML = `
+      <td class="py-3 px-4 font-semibold text-slate-800">
+        <div class="flex items-center gap-2">
+          <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+            <i class="fa-solid ${stage.icon || 'fa-droplet'}"></i>
+          </span>
+          <span>${stage.name}</span>
+        </div>
+      </td>
+      <td class="py-3 px-4 text-right font-medium text-slate-700">${stage.waterBefore.toLocaleString('en-IN')}</td>
+      <td class="py-3 px-4 text-right font-semibold text-blue-600">${stage.waterAfter.toLocaleString('en-IN')}</td>
+      <td class="py-3 px-4 text-right font-bold text-emerald-600">${stage.waterSaved.toLocaleString('en-IN')}</td>
+      <td class="py-3 px-4 text-right font-medium text-slate-700">${stage.blendedTds} mg/L</td>
+      <td class="py-3 px-4 text-right font-medium text-slate-700">${stage.blendedHardness} mg/L</td>
+      <td class="py-3 px-4 text-center font-semibold text-slate-700">${stage.maxFraction}%</td>
+      <td class="py-3 px-4 text-center">${statusBadge}</td>
+      <td class="py-3 px-4 text-right font-bold ${stage.savingPct > 0 ? 'text-emerald-600' : 'text-slate-400'}">${stage.savingPct}%</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Update table totals
+  const totalDemandEl = document.getElementById('blend-total-demand');
+  if (totalDemandEl) totalDemandEl.innerText = `${res.totalBefore.toLocaleString('en-IN')} L/d`;
+
+  const totalFreshEl = document.getElementById('blend-total-fresh');
+  if (totalFreshEl) totalFreshEl.innerText = `${res.totalAfter.toLocaleString('en-IN')} L/d`;
+
+  const totalRecycledEl = document.getElementById('blend-total-recycled');
+  if (totalRecycledEl) totalRecycledEl.innerText = `${res.totalSaved.toLocaleString('en-IN')} L/d`;
+
+  const totalSavingPctEl = document.getElementById('blend-total-saving-pct');
+  if (totalSavingPctEl) totalSavingPctEl.innerText = `${res.reductionPct}%`;
 }
 
 // Bar Chart: Process-wise Before vs After
@@ -667,6 +901,15 @@ function renderRecommendations() {
       priorityBadge = '<span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">Standard / Low</span>';
     }
 
+    let limitedByBadge = '';
+    if (proc.limitedBy === 'supply') {
+      limitedByBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200"><i class="fa-solid fa-battery-empty mr-1"></i> Supply Limited</span>';
+    } else if (proc.limitedBy === 'quality') {
+      limitedByBadge = `<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Quality Capped (${proc.limitingConstraint || 'TDS'})</span>`;
+    } else if (proc.limitedBy === 'demand') {
+      limitedByBadge = '<span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i> 100% Demand Met</span>';
+    }
+
     const card = document.createElement('div');
     card.className = 'glass-card p-5 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-slate-200/80 shadow-sm hover:shadow-md transition-shadow';
     card.innerHTML = `
@@ -675,14 +918,17 @@ function renderRecommendations() {
           <i class="fa-solid ${proc.icon}"></i>
         </div>
         <div>
-          <div class="flex items-center gap-2 mb-1">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
             <h4 class="font-bold text-slate-800 text-base">${proc.name}</h4>
             ${priorityBadge}
+            ${limitedByBadge}
           </div>
           <p class="text-sm text-slate-600 font-medium">${proc.recommendation}</p>
-          <div class="flex items-center gap-4 mt-2 text-xs text-slate-400">
-            <span>Current: <strong class="text-slate-600">${proc.waterBefore.toLocaleString('en-IN')} L/day</strong></span>
-            <span>Target: <strong class="text-emerald-600">${proc.waterAfter.toLocaleString('en-IN')} L/day</strong></span>
+          <div class="flex flex-wrap items-center gap-4 mt-2 text-xs text-slate-400">
+            <span>Baseline: <strong class="text-slate-600">${proc.waterBefore.toLocaleString('en-IN')} L/d</strong></span>
+            <span>Target: <strong class="text-emerald-600">${proc.waterAfter.toLocaleString('en-IN')} L/d</strong></span>
+            <span>Blended TDS: <strong class="text-purple-600">${proc.blendedTds || '-'} mg/L</strong></span>
+            <span>Quality Cap: <strong class="text-blue-600">${proc.maxFraction || 0}%</strong></span>
           </div>
         </div>
       </div>
@@ -903,5 +1149,130 @@ window.closeSimulationModal = function() {
     document.body.style.overflow = '';
   }
 };
+
+// 5-Minute Presentation Demo Guide Modal Controls
+window.openDemoGuideModal = function() {
+  const modal = document.getElementById('demo-guide-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeDemoGuideModal = function() {
+  const modal = document.getElementById('demo-guide-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+// Load sample factory benchmark data (40,000 L/d demand, 7,450 L/d treated supply)
+window.loadSampleFactory = function() {
+  state.user.isLoggedIn = true;
+  state.user.email = 'manager@abctextiles.com';
+  state.factory = {
+    name: 'ABC Textiles',
+    capacity: 1000,
+    workingDays: 26,
+    waterCost: 50,
+    electricityCost: 7.1,
+    chemicalCost: 151,
+    fabricType: 'Cotton',
+    freshTds: 150,
+    freshHardness: 80,
+    treatedTds: 650,
+    treatedHardness: 200,
+    treatedAvailable: 7450
+  };
+  state.processes = [
+    {
+      id: 1,
+      name: 'Fabric Preparation',
+      water: 8000,
+      electricity: 1200,
+      chemical: 1500,
+      other: 1300,
+      savingPct: 0.15,
+      maxTds: 375,
+      maxHardness: 160,
+      recommendation: 'Reuse rinse water, optimize chemical dose',
+      priority: 'Medium',
+      icon: 'fa-lightbulb'
+    },
+    {
+      id: 2,
+      name: 'Dyeing',
+      water: 15000,
+      electricity: 2500,
+      chemical: 3000,
+      other: 2000,
+      savingPct: 0.15,
+      maxTds: 250,
+      maxHardness: 100,
+      recommendation: 'Improve dyeing efficiency, use low-liquor ratio machines',
+      priority: 'High',
+      icon: 'fa-flask'
+    },
+    {
+      id: 3,
+      name: 'Washing & Rinsing',
+      water: 10000,
+      electricity: 1500,
+      chemical: 800,
+      other: 1200,
+      savingPct: 0.30,
+      maxTds: 700,
+      maxHardness: 250,
+      recommendation: 'Optimize rinse cycles, reuse suitable rinse water',
+      priority: 'High',
+      icon: 'fa-recycle'
+    },
+    {
+      id: 4,
+      name: 'Finishing',
+      water: 4000,
+      electricity: 800,
+      chemical: 600,
+      other: 1100,
+      savingPct: 0.10,
+      maxTds: 350,
+      maxHardness: 120,
+      recommendation: 'Use low-water finishing techniques',
+      priority: 'Low',
+      icon: 'fa-spray-can'
+    },
+    {
+      id: 5,
+      name: 'Machine Cleaning',
+      water: 3000,
+      electricity: 500,
+      chemical: 300,
+      other: 700,
+      savingPct: 0.20,
+      maxTds: 900,
+      maxHardness: 300,
+      recommendation: 'Use high-pressure low-flow cleaning systems',
+      priority: 'Medium',
+      icon: 'fa-faucet-drip'
+    }
+  ];
+  state.scenario = 'standard';
+  saveStateToStorage();
+  syncFactoryInputsToUI();
+  renderProcessTable();
+  calculateOptimization();
+  goToStep(6);
+};
+
+// Global escape key listener to close active modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeDemoGuideModal();
+    closeFlowchartModal();
+    closeSimulationModal();
+  }
+});
+
 
 
