@@ -869,3 +869,21 @@ window.startQuickDemo = function() {
   state.user.email = 'demo@abctextiles.com';
   goToStep(3);
 };
+
+// Flowchart Lightbox Modal Controls
+window.openFlowchartModal = function() {
+  const modal = document.getElementById('flowchart-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeFlowchartModal = function() {
+  const modal = document.getElementById('flowchart-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
