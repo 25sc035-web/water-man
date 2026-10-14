@@ -1399,6 +1399,23 @@ window.closeDemoGuideModal = function() {
   }
 };
 
+// Technical Audit Findings & Due Diligence Modal Controls
+window.openAuditFindingsModal = function() {
+  const modal = document.getElementById('audit-findings-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeAuditFindingsModal = function() {
+  const modal = document.getElementById('audit-findings-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
 // Load sample factory benchmark data (40,000 L/d demand, 7,450 L/d treated supply)
 window.loadSampleFactory = function() {
   state.user.isLoggedIn = true;
@@ -1503,6 +1520,7 @@ document.addEventListener('keydown', (e) => {
     closeDemoGuideModal();
     closeFlowchartModal();
     closeSimulationModal();
+    closeAuditFindingsModal();
   }
 });
 
