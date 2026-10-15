@@ -82,6 +82,14 @@ function evaluate(processes, factory, options = {}) {
   const specificWaterBefore = capacity > 0 ? Number((totalDemand / capacity).toFixed(1)) : 0;
   const specificWaterAfter = capacity > 0 ? Number((totalFresh / capacity).toFixed(1)) : 0;
 
+  // 7. Active Recycling Options Modeling
+  const recyclingOptions = options.recyclingOptions || fact.recyclingOptions || {};
+  const activeRecyclingTechniques = [];
+  if (recyclingOptions.counterCurrent !== false) activeRecyclingTechniques.push('Counter-Current Washing Cascade');
+  if (recyclingOptions.prepRecovery !== false) activeRecyclingTechniques.push('Bleach & Caustic Prep Rinse Recovery');
+  if (recyclingOptions.tertiaryEtp !== false) activeRecyclingTechniques.push('Tertiary ETP Clarified Buffer Loop');
+  if (recyclingOptions.dyeBath) activeRecyclingTechniques.push('Ultrafiltration Dye Bath Recovery');
+
   return {
     totalDemand,
     totalFresh,
@@ -96,6 +104,7 @@ function evaluate(processes, factory, options = {}) {
     annualCostSaving,
     specificWaterBefore,
     specificWaterAfter,
+    activeRecyclingTechniques,
     blendResults,
     perStage: blendResults ? blendResults.perStage : [],
     unusedTreatedWater: blendResults ? blendResults.unusedTreatedWater : 0

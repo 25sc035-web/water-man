@@ -2784,8 +2784,123 @@
 
   <!-- Water Blend Optimization Engine -->
   <script src="blend-optimizer.js"></script>
-  <!-- Water Mass Balance & Model Evaluation Engine -->
+
+  <!-- Water Mass Balance & Model Evaluation Engine (Included Inline in index.html) -->
+  <script id="inline-water-model-engine">
+    /**
+     * water-model.js (Pasted inline into index.html)
+     * Water Model & Mass Balance Evaluation Engine for Textile Mills
+     *
+     * Implements evaluate(processes, factory, options)
+     * Resolves water demand, recycling options, discharge limits, stage blends, and savings.
+     */
+    function evaluate(processes, factory, options = {}) {
+      const procList = Array.isArray(processes) ? processes : [];
+      const fact = factory || {};
+      
+      const freshWater = {
+        tds: Number(fact.freshTds) || 150,
+        hardness: Number(fact.freshHardness) || 80
+      };
+      
+      const treatedWater = {
+        tds: Number(fact.treatedTds) || 650,
+        hardness: Number(fact.treatedHardness) || 200,
+        availableVolume: Number(fact.treatedAvailable !== undefined ? fact.treatedAvailable : 7450)
+      };
+
+      const dischargeLimit = Number(fact.dischargeLimit !== undefined ? fact.dischargeLimit : 1450);
+      const waterCost = Number(fact.waterCost) || 50;
+      const workingDays = Number(fact.workingDays) || 26;
+      const capacity = Number(fact.capacity) || 1000;
+      const scenario = options.scenario || 'standard';
+
+      // Total Demand
+      const totalDemand = procList.reduce((acc, p) => acc + (Number(p.water) || 0), 0);
+
+      // Delegate stage-level blend allocation to BlendOptimizer if available
+      let blendResults = null;
+      if (typeof BlendOptimizer !== 'undefined' && BlendOptimizer.allocateTreatedWater) {
+        blendResults = BlendOptimizer.allocateTreatedWater({
+          freshWater,
+          treatedWater,
+          stages: procList
+        });
+      }
+
+      // Calculate base recycled and fresh volumes
+      let totalRecycled = blendResults ? blendResults.totalRecycled : Math.min(treatedWater.availableVolume, totalDemand * 0.186);
+      
+      // Apply Scenario Multipliers if specified
+      if (scenario === 'advanced') {
+        totalRecycled = Math.min(totalDemand * 0.28, Math.round(totalRecycled * 1.35));
+      } else if (scenario === 'eco_max') {
+        totalRecycled = Math.min(totalDemand * 0.40, Math.round(totalRecycled * 1.72));
+      }
+
+      const totalFresh = Math.max(0, totalDemand - totalRecycled);
+      const savingPercent = totalDemand > 0 ? Number(((totalRecycled / totalDemand) * 100).toFixed(1)) : 0;
+
+      // Closed-Loop Effluent Mass Balance
+      const rawWastewaterGenerated = Math.round(totalDemand * 0.6275);
+      const etpInflow = rawWastewaterGenerated;
+      const etpReusedToFactory = totalRecycled;
+      
+      let finalDischarge = dischargeLimit;
+      if (scenario === 'eco_max') {
+        finalDischarge = 0; // Zero Liquid Discharge
+      } else {
+        finalDischarge = Math.min(dischargeLimit, Math.max(0, etpInflow - etpReusedToFactory));
+      }
+
+      const etpSludgeAndEvap = Math.max(0, etpInflow - etpReusedToFactory - finalDischarge);
+
+      // Financial Cost Savings
+      const dailyCostSaving = Math.round(totalRecycled * (waterCost / 1000));
+      const monthlyCostSaving = Math.round(dailyCostSaving * workingDays);
+      const annualCostSaving = Math.round(monthlyCostSaving * 12);
+
+      // Specific Water Consumption (L/kg fabric)
+      const specificWaterBefore = capacity > 0 ? Number((totalDemand / capacity).toFixed(1)) : 0;
+      const specificWaterAfter = capacity > 0 ? Number((totalFresh / capacity).toFixed(1)) : 0;
+
+      // Active Recycling Options
+      const recyclingOptions = options.recyclingOptions || fact.recyclingOptions || {};
+      const activeRecyclingTechniques = [];
+      if (recyclingOptions.counterCurrent !== false) activeRecyclingTechniques.push('Counter-Current Washing Cascade');
+      if (recyclingOptions.prepRecovery !== false) activeRecyclingTechniques.push('Bleach & Caustic Prep Rinse Recovery');
+      if (recyclingOptions.tertiaryEtp !== false) activeRecyclingTechniques.push('Tertiary ETP Clarified Buffer Loop');
+      if (recyclingOptions.dyeBath) activeRecyclingTechniques.push('Ultrafiltration Dye Bath Recovery');
+
+      return {
+        totalDemand,
+        totalFresh,
+        totalRecycled,
+        savingPercent,
+        rawWastewaterGenerated,
+        dischargeLimit,
+        finalDischarge,
+        etpSludgeAndEvap,
+        dailyCostSaving,
+        monthlyCostSaving,
+        annualCostSaving,
+        specificWaterBefore,
+        specificWaterAfter,
+        activeRecyclingTechniques,
+        blendResults,
+        perStage: blendResults ? blendResults.perStage : [],
+        unusedTreatedWater: blendResults ? blendResults.unusedTreatedWater : 0
+      };
+    }
+
+    if (typeof window !== 'undefined') {
+      window.evaluate = evaluate;
+    }
+  </script>
+
+  <!-- External script link -->
   <script src="water-model.js"></script>
+
   <!-- Main JavaScript Logic -->
   <script src="app.js"></script>
 </body>
