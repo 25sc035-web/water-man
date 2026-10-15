@@ -1091,59 +1091,73 @@
               <tbody class="divide-y divide-slate-100 text-slate-700">
                 <tr class="hover:bg-slate-50/70">
                   <td class="py-3 px-3.5 text-center">
-                    <input type="checkbox" id="recycle-opt-counter-current" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                    <input type="checkbox" id="pathway-rinse" checked class="pathway-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="handlePathwayToggle()">
                   </td>
                   <td class="py-3 px-3 font-semibold text-slate-900">
-                    <div>Counter-Current Rinsing System</div>
-                    <div class="text-[10px] text-slate-400">Cascades rinse water from clean to dirty baths</div>
+                    <div>Rinse Water Recovery</div>
+                    <div class="text-[10px] text-slate-400">Internal reuse of wash & bleach rinse water without external treatment</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Washing, Rinsing & Bleach</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">30% internal reuse</td>
+                  <td class="py-3 px-3 text-right font-medium">₹35,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">4.2 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Internal loop (OPEX ₹2/kL)</td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="pathway-counter" class="pathway-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="handlePathwayToggle()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>Counter-Current Washing</div>
+                    <div class="text-[10px] text-slate-400">Process change cascading clean rinse to dirty baths</div>
                   </td>
                   <td class="py-3 px-3 font-medium text-slate-800">Washing & Rinsing</td>
-                  <td class="py-3 px-3 text-right font-bold text-emerald-600">30% (3,000 L/d)</td>
-                  <td class="py-3 px-3 text-right font-medium">₹35,000</td>
-                  <td class="py-3 px-3 text-right font-semibold text-blue-700">3.6 months</td>
-                  <td class="py-3 px-3.5 text-slate-500">Tolerates up to 700 mg/L TDS</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">25% demand cut</td>
+                  <td class="py-3 px-3 text-right font-medium">₹60,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">13.2 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Maintains washing quality</td>
                 </tr>
                 <tr class="hover:bg-slate-50/70">
                   <td class="py-3 px-3.5 text-center">
-                    <input type="checkbox" id="recycle-opt-prep-reuse" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                    <input type="checkbox" id="pathway-lowliquor" class="pathway-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="handlePathwayToggle()">
                   </td>
                   <td class="py-3 px-3 font-semibold text-slate-900">
-                    <div>Scouring & Desize Rinse Recovery</div>
-                    <div class="text-[10px] text-slate-400">Direct filtration for preparatory stages</div>
+                    <div>Low-Liquor Dyeing Nozzles</div>
+                    <div class="text-[10px] text-slate-400">Upgraded air-flow/nozzle liquor ratio in dyeing machines</div>
                   </td>
-                  <td class="py-3 px-3 font-medium text-slate-800">Fabric Preparation</td>
-                  <td class="py-3 px-3 text-right font-bold text-emerald-600">15% (1,200 L/d)</td>
-                  <td class="py-3 px-3 text-right font-medium">₹25,000</td>
-                  <td class="py-3 px-3 text-right font-semibold text-blue-700">4.2 months</td>
-                  <td class="py-3 px-3.5 text-slate-500">Maintains &lt; 375 mg/L TDS</td>
-                </tr>
-                <tr class="hover:bg-slate-50/70">
-                  <td class="py-3 px-3.5 text-center">
-                    <input type="checkbox" id="recycle-opt-tertiary-etp" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
-                  </td>
-                  <td class="py-3 px-3 font-semibold text-slate-900">
-                    <div>Tertiary ETP Clarified Buffer Loop</div>
-                    <div class="text-[10px] text-slate-400">Sand + carbon filtered permeate return</div>
-                  </td>
-                  <td class="py-3 px-3 font-medium text-slate-800">All High-Tolerance Lines</td>
-                  <td id="recycle-opt-stat-tertiary" class="py-3 px-3 text-right font-bold text-emerald-600">18.6% (7,450 L/d)</td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Dyeing</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">15% demand cut</td>
                   <td class="py-3 px-3 text-right font-medium">₹80,000</td>
-                  <td class="py-3 px-3 text-right font-semibold text-blue-700">8.3 months</td>
-                  <td class="py-3 px-3.5 text-slate-500">Blended TDS 523 mg/L</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">25.6 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Dye liquor ratio optimization</td>
                 </tr>
                 <tr class="hover:bg-slate-50/70">
                   <td class="py-3 px-3.5 text-center">
-                    <input type="checkbox" id="recycle-opt-dye-bath" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                    <input type="checkbox" id="pathway-etp" checked class="pathway-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="handlePathwayToggle()">
                   </td>
                   <td class="py-3 px-3 font-semibold text-slate-900">
-                    <div>Ultrafiltration Dye Bath Recovery</div>
-                    <div class="text-[10px] text-slate-400">Membrane color removal for light shade reuse</div>
+                    <div>ETP Treated-Water Reuse</div>
+                    <div class="text-[10px] text-slate-400">Clarified and filtered tertiary effluent reuse</div>
                   </td>
-                  <td class="py-3 px-3 font-medium text-slate-800">Dyeing & Bleaching</td>
-                  <td class="py-3 px-3 text-right font-bold text-emerald-600">22% (3,300 L/d)</td>
-                  <td class="py-3 px-3 text-right font-medium">₹1,80,000</td>
-                  <td class="py-3 px-3 text-right font-semibold text-blue-700">14.2 months</td>
-                  <td class="py-3 px-3.5 text-slate-500">Strict &lt; 250 mg/L TDS bound</td>
+                  <td class="py-3 px-3 font-medium text-slate-800">All Quality-Permitted Stages</td>
+                  <td id="recycle-opt-stat-tertiary" class="py-3 px-3 text-right font-bold text-emerald-600">90% yield reuse</td>
+                  <td class="py-3 px-3 text-right font-medium">₹1,50,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">8.7 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">TDS 650 mg/L · Hardness 200</td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="pathway-ro" class="pathway-checkbox rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="handlePathwayToggle()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>RO Membrane + Zero Discharge (ZLD)</div>
+                    <div class="text-[10px] text-slate-400">High-purity permeate recycling with 0 discharge to nature</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Dyeing & Bleaching (High Purity)</td>
+                  <td class="py-3 px-3 text-right font-bold text-purple-600">75% yield (0 discharge)</td>
+                  <td class="py-3 px-3 text-right font-medium">₹4,50,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">57.7 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">TDS 50 mg/L · Hardness 10</td>
                 </tr>
               </tbody>
             </table>
@@ -2242,7 +2256,7 @@
             </li>
             <li class="flex items-start gap-2">
               <span class="text-amber-400 font-semibold">•</span>
-              <div><strong class="text-slate-200">blend-optimizer.js:</strong> Conservation blend equation solver prioritizing high-tolerance washing stages against TDS limits.</div>
+              <div><strong class="text-slate-200">water-model.js (FINAL):</strong> Unified evaluation engine with blend conservation equation, pathway selection, and scenario rankings.</div>
             </li>
             <li class="flex items-start gap-2">
               <span class="text-amber-400 font-semibold">•</span>
@@ -2782,123 +2796,7 @@
     </div>
   </div>
 
-  <!-- Water Blend Optimization Engine -->
-  <script src="blend-optimizer.js"></script>
-
-  <!-- Water Mass Balance & Model Evaluation Engine (Included Inline in index.html) -->
-  <script id="inline-water-model-engine">
-    /**
-     * water-model.js (Pasted inline into index.html)
-     * Water Model & Mass Balance Evaluation Engine for Textile Mills
-     *
-     * Implements evaluate(processes, factory, options)
-     * Resolves water demand, recycling options, discharge limits, stage blends, and savings.
-     */
-    function evaluate(processes, factory, options = {}) {
-      const procList = Array.isArray(processes) ? processes : [];
-      const fact = factory || {};
-      
-      const freshWater = {
-        tds: Number(fact.freshTds) || 150,
-        hardness: Number(fact.freshHardness) || 80
-      };
-      
-      const treatedWater = {
-        tds: Number(fact.treatedTds) || 650,
-        hardness: Number(fact.treatedHardness) || 200,
-        availableVolume: Number(fact.treatedAvailable !== undefined ? fact.treatedAvailable : 7450)
-      };
-
-      const dischargeLimit = Number(fact.dischargeLimit !== undefined ? fact.dischargeLimit : 1450);
-      const waterCost = Number(fact.waterCost) || 50;
-      const workingDays = Number(fact.workingDays) || 26;
-      const capacity = Number(fact.capacity) || 1000;
-      const scenario = options.scenario || 'standard';
-
-      // Total Demand
-      const totalDemand = procList.reduce((acc, p) => acc + (Number(p.water) || 0), 0);
-
-      // Delegate stage-level blend allocation to BlendOptimizer if available
-      let blendResults = null;
-      if (typeof BlendOptimizer !== 'undefined' && BlendOptimizer.allocateTreatedWater) {
-        blendResults = BlendOptimizer.allocateTreatedWater({
-          freshWater,
-          treatedWater,
-          stages: procList
-        });
-      }
-
-      // Calculate base recycled and fresh volumes
-      let totalRecycled = blendResults ? blendResults.totalRecycled : Math.min(treatedWater.availableVolume, totalDemand * 0.186);
-      
-      // Apply Scenario Multipliers if specified
-      if (scenario === 'advanced') {
-        totalRecycled = Math.min(totalDemand * 0.28, Math.round(totalRecycled * 1.35));
-      } else if (scenario === 'eco_max') {
-        totalRecycled = Math.min(totalDemand * 0.40, Math.round(totalRecycled * 1.72));
-      }
-
-      const totalFresh = Math.max(0, totalDemand - totalRecycled);
-      const savingPercent = totalDemand > 0 ? Number(((totalRecycled / totalDemand) * 100).toFixed(1)) : 0;
-
-      // Closed-Loop Effluent Mass Balance
-      const rawWastewaterGenerated = Math.round(totalDemand * 0.6275);
-      const etpInflow = rawWastewaterGenerated;
-      const etpReusedToFactory = totalRecycled;
-      
-      let finalDischarge = dischargeLimit;
-      if (scenario === 'eco_max') {
-        finalDischarge = 0; // Zero Liquid Discharge
-      } else {
-        finalDischarge = Math.min(dischargeLimit, Math.max(0, etpInflow - etpReusedToFactory));
-      }
-
-      const etpSludgeAndEvap = Math.max(0, etpInflow - etpReusedToFactory - finalDischarge);
-
-      // Financial Cost Savings
-      const dailyCostSaving = Math.round(totalRecycled * (waterCost / 1000));
-      const monthlyCostSaving = Math.round(dailyCostSaving * workingDays);
-      const annualCostSaving = Math.round(monthlyCostSaving * 12);
-
-      // Specific Water Consumption (L/kg fabric)
-      const specificWaterBefore = capacity > 0 ? Number((totalDemand / capacity).toFixed(1)) : 0;
-      const specificWaterAfter = capacity > 0 ? Number((totalFresh / capacity).toFixed(1)) : 0;
-
-      // Active Recycling Options
-      const recyclingOptions = options.recyclingOptions || fact.recyclingOptions || {};
-      const activeRecyclingTechniques = [];
-      if (recyclingOptions.counterCurrent !== false) activeRecyclingTechniques.push('Counter-Current Washing Cascade');
-      if (recyclingOptions.prepRecovery !== false) activeRecyclingTechniques.push('Bleach & Caustic Prep Rinse Recovery');
-      if (recyclingOptions.tertiaryEtp !== false) activeRecyclingTechniques.push('Tertiary ETP Clarified Buffer Loop');
-      if (recyclingOptions.dyeBath) activeRecyclingTechniques.push('Ultrafiltration Dye Bath Recovery');
-
-      return {
-        totalDemand,
-        totalFresh,
-        totalRecycled,
-        savingPercent,
-        rawWastewaterGenerated,
-        dischargeLimit,
-        finalDischarge,
-        etpSludgeAndEvap,
-        dailyCostSaving,
-        monthlyCostSaving,
-        annualCostSaving,
-        specificWaterBefore,
-        specificWaterAfter,
-        activeRecyclingTechniques,
-        blendResults,
-        perStage: blendResults ? blendResults.perStage : [],
-        unusedTreatedWater: blendResults ? blendResults.unusedTreatedWater : 0
-      };
-    }
-
-    if (typeof window !== 'undefined') {
-      window.evaluate = evaluate;
-    }
-  </script>
-
-  <!-- External script link -->
+  <!-- Water Model & Optimization Engine (FINAL) -->
   <script src="water-model.js"></script>
 
   <!-- Main JavaScript Logic -->

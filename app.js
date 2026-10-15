@@ -512,123 +512,112 @@ function runAnalysisAnimation() {
 
 // Core Optimization Calculation Engine
 function calculateOptimization() {
-  const factory = state.factory;
+  const factory = state.factory || {};
 
-  // 1. Call water-model.js evaluate(processes, factory, options)
+  // 1. Read Step 4 Recycling Pathway checkboxes if present in DOM
+  const pathwayIds = ['rinse', 'counter', 'lowliquor', 'etp', 'ro'];
+  const hasPathwayCheckboxes = pathwayIds.some(id => document.getElementById(`pathway-${id}`));
+  let enabledPathways = null;
+  if (hasPathwayCheckboxes) {
+    enabledPathways = pathwayIds.filter(id => document.getElementById(`pathway-${id}`)?.checked);
+  }
+
+  // 2. Call water-model.js evaluate(processes, factory, options)
   let modelResult = null;
   if (typeof evaluate === 'function') {
     try {
-      modelResult = evaluate(state.processes, state.factory, { scenario: state.scenario });
+      const evalOptions = enabledPathways ? { enabled: enabledPathways } : { scenario: state.scenario || 'standard' };
+      modelResult = evaluate(state.processes, state.factory, evalOptions);
     } catch (err) {
       console.warn('water-model.js evaluate error, falling back:', err);
     }
   }
 
   const freshWater = {
-    tds: Number(factory.freshTds) || 150,
-    hardness: Number(factory.freshHardness) || 80
+    tds: Number(factory.freshTds) || (typeof ASSUMPTIONS !== 'undefined' ? ASSUMPTIONS.fresh.tds : 150),
+    hardness: Number(factory.freshHardness) || (typeof ASSUMPTIONS !== 'undefined' ? ASSUMPTIONS.fresh.hardness : 80)
   };
-  const treatedWater = {
-    tds: Number(factory.treatedTds) || 650,
-    hardness: Number(factory.treatedHardness) || 200,
-    availableVolume: Number(factory.treatedAvailable !== undefined ? factory.treatedAvailable : 7450)
-  };
+  const isRoActive = modelResult ? modelResult.enabled.includes('ro') : (state.scenario === 'eco_max');
+  const treatTds = isRoActive ? 50 : (Number(factory.treatedTds) || 650);
+  const treatHardness = isRoActive ? 10 : (Number(factory.treatedHardness) || 200);
 
-  // Scenario Multiplier:
-  // standard: 1.0 (benchmark allocations: 18.6% headline saving)
-  // advanced: 1.35 (+35% extra recycling via counter-current rinsing & filtration)
-  // eco_max: 1.70 (+70% ultra-low liquor ratio & closed loop membrane polishing)
-  let multiplier = 1.0;
-  if (state.scenario === 'advanced') multiplier = 1.35;
-  if (state.scenario === 'eco_max') multiplier = 1.70;
-
-  const adjustedTreatedWater = {
-    ...treatedWater,
-    availableVolume: Math.round(treatedWater.availableVolume * multiplier)
-  };
-
-  let blendResults = modelResult?.blendResults || null;
-  if (!blendResults && typeof BlendOptimizer !== 'undefined') {
-    blendResults = BlendOptimizer.allocateTreatedWater({
-      freshWater,
-      treatedWater: adjustedTreatedWater,
-      stages: state.processes.map(proc => ({
-        id: proc.id,
-        name: proc.name,
-        water: Number(proc.water) || 0,
-        demand: Number(proc.water) || 0,
-        maxTds: Number(proc.maxTds) || 600,
-        maxHardness: Number(proc.maxHardness) || 200,
-        recommendation: proc.recommendation,
-        priority: proc.priority,
-        icon: proc.icon
-      }))
-    });
-  }
-
-  let totalBefore = modelResult ? modelResult.totalDemand : 0;
-  let totalSaved = modelResult ? modelResult.totalRecycled : 0;
-  let totalAfter = modelResult ? modelResult.totalFresh : 0;
+  let totalBefore = 0;
+  let totalSaved = 0;
+  let totalAfter = 0;
   const breakdown = [];
 
-  const perStageList = (modelResult && modelResult.perStage && modelResult.perStage.length)
-    ? modelResult.perStage
-    : (blendResults ? blendResults.perStage : []);
+  if (modelResult && Array.isArray(modelResult.perStage) && modelResult.perStage.length) {
+    totalBefore = modelResult.totalDemand;
+    totalSaved = modelResult.totalRecycled;
+    totalAfter = modelResult.totalFresh;
 
-  if (perStageList.length) {
-    if (!modelResult) {
-      totalBefore = blendResults.totalDemand;
-      totalSaved = blendResults.totalRecycled;
-      totalAfter = blendResults.totalFresh;
-    }
+    modelResult.perStage.forEach((stage, idx) => {
+      const origProc = state.processes.find(p => (p.name && stage.name && p.name.toLowerCase() === stage.name.toLowerCase()) || p.id === stage.id) || state.processes[idx] || {};
 
-    perStageList.forEach(stage => {
-      const origProc = state.processes.find(p => p.id === stage.id) || {};
-      
-      // Formulate dynamic recommendation reflecting limitedBy
+      // Stage blended quality calculation
+      const stageTotalWater = stage.fresh + stage.internal + stage.etpReuse;
+      const blendedTds = stageTotalWater > 0
+        ? Math.round((stage.fresh * freshWater.tds + stage.internal * freshWater.tds + stage.etpReuse * treatTds) / stageTotalWater)
+        : freshWater.tds;
+      const blendedHardness = stageTotalWater > 0
+        ? Math.round((stage.fresh * freshWater.hardness + stage.internal * freshWater.hardness + stage.etpReuse * treatHardness) / stageTotalWater)
+        : freshWater.hardness;
+
+      // Dynamic recommendation reflecting physical model bottlenecks
       let dynamicRec = origProc.recommendation || 'Optimize process water flow';
       if (stage.limitedBy === 'supply') {
-        dynamicRec = `${stage.name} could take up to ${stage.maxFraction}% treated water, but supply is exhausted. Adding RO capacity would unlock more savings.`;
+        dynamicRec = `${stage.name} can accept up to ${Math.round(stage.maxFraction * 100)}% recycled water, but treated effluent supply is exhausted. Upgrading ETP/RO capacity unlocks higher savings.`;
       } else if (stage.limitedBy === 'quality') {
-        dynamicRec = `${stage.name} reuse is restricted by strict ${stage.limitingConstraint} quality limits. Nanofiltration or RO polishing required to increase reuse fraction.`;
-      } else if (stage.limitedBy === 'demand') {
-        dynamicRec = `${stage.name} water demand is 100% met by treated blend within safe quality limits.`;
+        dynamicRec = `${stage.name} reuse is restricted by fabric quality limits. RO polishing or nanofiltration can safely increase blend ratio.`;
+      } else if (stage.limitedBy === 'safety cap') {
+        dynamicRec = `${stage.name} is running at maximum safe recycled blend cap (50%). Excellent efficiency with full fabric quality protection.`;
+      } else if (stage.fresh === 0 && stage.baseline > 0) {
+        dynamicRec = `${stage.name} water demand is completely met by internal and treated recycling loops.`;
       }
 
+      const waterSaved = stage.baseline - stage.fresh;
+      const savingPct = stage.baseline > 0 ? Math.round((waterSaved / stage.baseline) * 100) : 0;
+
       breakdown.push({
-        id: stage.id,
+        id: origProc.id || `stage-${idx + 1}`,
         name: stage.name,
-        waterBefore: stage.demand,
-        waterAfter: stage.freshVolume,
-        waterSaved: stage.recycledVolume,
-        savingPct: stage.savingPercent,
-        blendedTds: stage.blendedTds,
-        blendedHardness: stage.blendedHardness,
-        maxFraction: stage.maxFraction,
+        waterBefore: stage.baseline,
+        waterAfter: stage.fresh,
+        waterSaved,
+        savingPct,
+        afterReduction: stage.afterReduction,
+        internalReuse: stage.internal,
+        etpReuse: stage.etpReuse,
+        blendedTds,
+        blendedHardness,
+        maxFraction: Math.round(stage.maxFraction * 100),
         limitedBy: stage.limitedBy,
-        limitingConstraint: stage.limitingConstraint,
+        limitingConstraint: stage.limitedBy === 'quality' ? 'TDS / Hardness' : '',
         recommendation: dynamicRec,
         priority: origProc.priority || 'Medium',
         icon: origProc.icon || 'fa-droplet'
       });
     });
   } else {
-    // Fallback if BlendOptimizer is not loaded
-    state.processes.forEach(proc => {
+    // Pure calculation fallback if water-model.js is unavailable
+    state.processes.forEach((proc, idx) => {
       const waterBefore = Number(proc.water) || 0;
       totalBefore += waterBefore;
-      const effectiveSavingRate = Math.min(0.60, (proc.savingPct || 0.15) * multiplier);
+      const effectiveSavingRate = Math.min(0.50, proc.savingPct || 0.186);
       const waterSaved = Math.round(waterBefore * effectiveSavingRate);
       const waterAfter = waterBefore - waterSaved;
       totalSaved += waterSaved;
 
       breakdown.push({
-        id: proc.id,
+        id: proc.id || `stage-${idx + 1}`,
         name: proc.name,
         waterBefore,
         waterAfter,
         waterSaved,
         savingPct: Math.round((waterSaved / (waterBefore || 1)) * 100),
+        afterReduction: waterBefore,
+        internalReuse: 0,
+        etpReuse: waterSaved,
         blendedTds: 450,
         blendedHardness: 120,
         maxFraction: 50,
@@ -636,7 +625,7 @@ function calculateOptimization() {
         limitingConstraint: 'TDS',
         recommendation: proc.recommendation || 'Optimize process flow',
         priority: proc.priority || 'Medium',
-        icon: proc.icon || 'fa-water'
+        icon: proc.icon || 'fa-droplet'
       });
     });
     totalAfter = totalBefore - totalSaved;
@@ -647,12 +636,12 @@ function calculateOptimization() {
     : (totalBefore > 0 ? Number(((totalSaved / totalBefore) * 100).toFixed(1)) : 0);
 
   // Financial Cost calculations
-  const dailyCostSaving = modelResult 
-    ? modelResult.dailyCostSaving 
-    : Math.round(totalSaved * (factory.waterCost / 1000));
   const monthlyCostSaving = modelResult 
     ? modelResult.monthlyCostSaving 
-    : Math.round(dailyCostSaving * factory.workingDays);
+    : Math.round(totalSaved * ((factory.waterCost || 50) / 1000) * (factory.workingDays || 26));
+  const dailyCostSaving = (factory.workingDays || 26) > 0 
+    ? Math.round(monthlyCostSaving / (factory.workingDays || 26)) 
+    : Math.round(totalSaved * ((factory.waterCost || 50) / 1000));
   const annualCostSaving = modelResult 
     ? modelResult.annualCostSaving 
     : Math.round(monthlyCostSaving * 12);
@@ -660,15 +649,15 @@ function calculateOptimization() {
   // Mass balance & effluent metrics
   const rawWastewaterGenerated = modelResult 
     ? modelResult.rawWastewaterGenerated 
-    : Math.round(totalBefore * 0.6275);
+    : Math.round(totalBefore * 0.9175);
   const dischargeLimit = modelResult 
-    ? modelResult.dischargeLimit 
+    ? (modelResult.dischargeLimit !== null ? modelResult.dischargeLimit : (Number(factory.dischargeLimit) || 1450)) 
     : (Number(factory.dischargeLimit) || 1450);
   const finalDischarge = modelResult 
     ? modelResult.finalDischarge 
     : Math.min(dischargeLimit, Math.max(0, rawWastewaterGenerated - totalSaved));
   const etpSludgeAndEvap = modelResult 
-    ? modelResult.etpSludgeAndEvap 
+    ? modelResult.etpLosses 
     : Math.max(0, rawWastewaterGenerated - totalSaved - finalDischarge);
 
   // Specific water consumption per kg of fabric
@@ -699,7 +688,6 @@ function calculateOptimization() {
     finalDischarge,
     etpSludgeAndEvap,
     breakdown,
-    blendResults: modelResult?.blendResults || blendResults,
     modelResult,
     generatedAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   };
@@ -744,7 +732,20 @@ function updateAllUIComputedValues(res) {
   setText('recycle-opt-stat-tertiary', `${res.reductionPct}% (${res.totalSaved.toLocaleString('en-IN')} L/d)`);
 
   // 4. Step 9 - Interactive Scenario Cards
-  if (typeof evaluate === 'function') {
+  if (typeof compareScenarios === 'function') {
+    try {
+      const scenarios = compareScenarios(state.processes, state.factory);
+      const std = scenarios.find(s => s.scenario === 'standard');
+      const adv = scenarios.find(s => s.scenario === 'advanced');
+      const eco = scenarios.find(s => s.scenario === 'eco_max');
+
+      if (std) setText('scenario-stat-standard', `${std.savingPercent}%`);
+      if (adv) setText('scenario-stat-advanced', `${adv.savingPercent}%`);
+      if (eco) setText('scenario-stat-eco_max', `${eco.savingPercent}%`);
+    } catch (e) {
+      console.warn('Scenario evaluation error:', e);
+    }
+  } else if (typeof evaluate === 'function') {
     try {
       const stdModel = evaluate(state.processes, state.factory, { scenario: 'standard' });
       const advModel = evaluate(state.processes, state.factory, { scenario: 'advanced' });
@@ -825,7 +826,7 @@ function renderBlendTable() {
 
   const stripUnused = document.getElementById('blend-strip-unused');
   if (stripUnused) {
-    const unused = res.blendResults ? res.blendResults.unusedTreatedWater : 0;
+    const unused = res.modelResult ? res.modelResult.unusedTreatedWater : 0;
     stripUnused.innerText = `${unused.toLocaleString('en-IN')} L/day`;
   }
 
@@ -835,11 +836,13 @@ function renderBlendTable() {
     if (stage.limitedBy === 'supply') {
       statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200" title="Quality allows up to ${stage.maxFraction}%, but supply was exhausted"><i class="fa-solid fa-battery-empty mr-1"></i> Supply Exhausted</span>`;
     } else if (stage.limitedBy === 'quality') {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200" title="Capped by strict ${stage.limitingConstraint || 'quality'} threshold"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Quality Limit (${stage.limitingConstraint || 'TDS'})</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200" title="Capped by strict process quality limits"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Quality Limit</span>`;
+    } else if (stage.limitedBy === 'safety cap') {
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 border border-purple-200" title="Capped at maximum safe share (50%)"><i class="fa-solid fa-shield-halved mr-1"></i> Safety Cap (50%)</span>`;
     } else if (stage.limitedBy === 'demand') {
       statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200"><i class="fa-solid fa-circle-check mr-1"></i> 100% Demand Met</span>`;
     } else {
-      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">None</span>`;
+      statusBadge = `<span class="px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-slate-100 text-slate-700">Direct Fresh</span>`;
     }
 
     const tr = document.createElement('tr');
@@ -1419,7 +1422,48 @@ window.setOptimizationScenario = function(scenarioName) {
     activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
   }
 
+  // Synchronize Step 4 Recycling Pathway checkboxes
+  const scenarioSet = (typeof SCENARIO_SETS !== 'undefined' && SCENARIO_SETS[scenarioName]) || ['rinse', 'etp'];
+  ['rinse', 'counter', 'lowliquor', 'etp', 'ro'].forEach(id => {
+    const cb = document.getElementById(`pathway-${id}`);
+    if (cb) cb.checked = scenarioSet.includes(id);
+  });
+
   // Recalculate
+  calculateOptimization();
+  renderResultsDashboard();
+  renderRecommendations();
+  renderDetailedReport();
+};
+
+// Step 4 Recycling Pathway Checkbox Handler
+window.handlePathwayToggle = function() {
+  const pathwayIds = ['rinse', 'counter', 'lowliquor', 'etp', 'ro'];
+  const enabled = pathwayIds.filter(id => document.getElementById(`pathway-${id}`)?.checked);
+
+  // If checkboxes match an exact scenario preset, highlight its scenario button
+  if (typeof SCENARIO_SETS !== 'undefined') {
+    let matchedScenario = null;
+    for (const [scName, scList] of Object.entries(SCENARIO_SETS)) {
+      if (scList.length === enabled.length && scList.every(p => enabled.includes(p))) {
+        matchedScenario = scName;
+        break;
+      }
+    }
+    if (matchedScenario) {
+      state.scenario = matchedScenario;
+      document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.classList.remove('bg-blue-600', 'text-white', 'shadow-md');
+        btn.classList.add('bg-slate-100', 'text-slate-700');
+      });
+      const activeBtn = document.getElementById(`scenario-${matchedScenario}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-md');
+        activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+      }
+    }
+  }
+
   calculateOptimization();
   renderResultsDashboard();
   renderRecommendations();
