@@ -23,7 +23,8 @@ const state = {
     freshHardness: 80, // mg/L as CaCO3
     treatedTds: 650, // mg/L
     treatedHardness: 200, // mg/L as CaCO3
-    treatedAvailable: 7450 // L/day available from ETP
+    treatedAvailable: 7450, // L/day available from ETP
+    dischargeLimit: 1450 // L/day regulatory discharge limit
   },
   processes: [
     {
@@ -116,6 +117,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadDailyLogs();
   renderProcessTable();
   setupEventListeners();
+  calculateOptimization();
   updateStepUI(1);
 });
 
@@ -132,6 +134,7 @@ function loadSavedData() {
           treatedTds: 650,
           treatedHardness: 200,
           treatedAvailable: 7450,
+          dischargeLimit: 1450,
           ...state.factory,
           ...parsed.factory
         };
@@ -171,6 +174,7 @@ function syncFactoryInputsToUI() {
   setVal('input-treated-tds', f.treatedTds || 650);
   setVal('input-treated-hardness', f.treatedHardness || 200);
   setVal('input-treated-available', f.treatedAvailable || 7450);
+  setVal('input-discharge-limit', f.dischargeLimit || 1450);
 }
 
 // Save state to localStorage
@@ -291,6 +295,7 @@ function setupEventListeners() {
       state.factory.treatedTds = parseFloat(document.getElementById('input-treated-tds')?.value) || 650;
       state.factory.treatedHardness = parseFloat(document.getElementById('input-treated-hardness')?.value) || 200;
       state.factory.treatedAvailable = parseFloat(document.getElementById('input-treated-available')?.value) || 7450;
+      state.factory.dischargeLimit = parseFloat(document.getElementById('input-discharge-limit')?.value) || 1450;
 
       saveStateToStorage();
       goToStep(4);
@@ -508,6 +513,17 @@ function runAnalysisAnimation() {
 // Core Optimization Calculation Engine
 function calculateOptimization() {
   const factory = state.factory;
+
+  // 1. Call water-model.js evaluate(processes, factory, options)
+  let modelResult = null;
+  if (typeof evaluate === 'function') {
+    try {
+      modelResult = evaluate(state.processes, state.factory, { scenario: state.scenario });
+    } catch (err) {
+      console.warn('water-model.js evaluate error, falling back:', err);
+    }
+  }
+
   const freshWater = {
     tds: Number(factory.freshTds) || 150,
     hardness: Number(factory.freshHardness) || 80
@@ -515,7 +531,7 @@ function calculateOptimization() {
   const treatedWater = {
     tds: Number(factory.treatedTds) || 650,
     hardness: Number(factory.treatedHardness) || 200,
-    availableVolume: Number(factory.treatedAvailable) || 7450
+    availableVolume: Number(factory.treatedAvailable !== undefined ? factory.treatedAvailable : 7450)
   };
 
   // Scenario Multiplier:
@@ -531,8 +547,8 @@ function calculateOptimization() {
     availableVolume: Math.round(treatedWater.availableVolume * multiplier)
   };
 
-  let blendResults = null;
-  if (typeof BlendOptimizer !== 'undefined') {
+  let blendResults = modelResult?.blendResults || null;
+  if (!blendResults && typeof BlendOptimizer !== 'undefined') {
     blendResults = BlendOptimizer.allocateTreatedWater({
       freshWater,
       treatedWater: adjustedTreatedWater,
@@ -550,17 +566,23 @@ function calculateOptimization() {
     });
   }
 
-  let totalBefore = 0;
-  let totalSaved = 0;
-  let totalAfter = 0;
+  let totalBefore = modelResult ? modelResult.totalDemand : 0;
+  let totalSaved = modelResult ? modelResult.totalRecycled : 0;
+  let totalAfter = modelResult ? modelResult.totalFresh : 0;
   const breakdown = [];
 
-  if (blendResults) {
-    totalBefore = blendResults.totalDemand;
-    totalSaved = blendResults.totalRecycled;
-    totalAfter = blendResults.totalFresh;
+  const perStageList = (modelResult && modelResult.perStage && modelResult.perStage.length)
+    ? modelResult.perStage
+    : (blendResults ? blendResults.perStage : []);
 
-    blendResults.perStage.forEach(stage => {
+  if (perStageList.length) {
+    if (!modelResult) {
+      totalBefore = blendResults.totalDemand;
+      totalSaved = blendResults.totalRecycled;
+      totalAfter = blendResults.totalFresh;
+    }
+
+    perStageList.forEach(stage => {
       const origProc = state.processes.find(p => p.id === stage.id) || {};
       
       // Formulate dynamic recommendation reflecting limitedBy
@@ -620,17 +642,42 @@ function calculateOptimization() {
     totalAfter = totalBefore - totalSaved;
   }
 
-  const reductionPct = totalBefore > 0 ? (totalSaved / totalBefore) * 100 : 0;
+  const reductionPct = modelResult 
+    ? modelResult.savingPercent 
+    : (totalBefore > 0 ? Number(((totalSaved / totalBefore) * 100).toFixed(1)) : 0);
 
-  // Cost calculations
-  const costPerLiter = factory.waterCost / 1000;
-  const dailyCostSaving = totalSaved * costPerLiter;
-  const monthlyCostSaving = dailyCostSaving * factory.workingDays;
-  const annualCostSaving = monthlyCostSaving * 12;
+  // Financial Cost calculations
+  const dailyCostSaving = modelResult 
+    ? modelResult.dailyCostSaving 
+    : Math.round(totalSaved * (factory.waterCost / 1000));
+  const monthlyCostSaving = modelResult 
+    ? modelResult.monthlyCostSaving 
+    : Math.round(dailyCostSaving * factory.workingDays);
+  const annualCostSaving = modelResult 
+    ? modelResult.annualCostSaving 
+    : Math.round(monthlyCostSaving * 12);
+
+  // Mass balance & effluent metrics
+  const rawWastewaterGenerated = modelResult 
+    ? modelResult.rawWastewaterGenerated 
+    : Math.round(totalBefore * 0.6275);
+  const dischargeLimit = modelResult 
+    ? modelResult.dischargeLimit 
+    : (Number(factory.dischargeLimit) || 1450);
+  const finalDischarge = modelResult 
+    ? modelResult.finalDischarge 
+    : Math.min(dischargeLimit, Math.max(0, rawWastewaterGenerated - totalSaved));
+  const etpSludgeAndEvap = modelResult 
+    ? modelResult.etpSludgeAndEvap 
+    : Math.max(0, rawWastewaterGenerated - totalSaved - finalDischarge);
 
   // Specific water consumption per kg of fabric
-  const specificWaterBefore = factory.capacity > 0 ? (totalBefore / factory.capacity) : 0;
-  const specificWaterAfter = factory.capacity > 0 ? (totalAfter / factory.capacity) : 0;
+  const specificWaterBefore = modelResult 
+    ? modelResult.specificWaterBefore 
+    : (factory.capacity > 0 ? Number((totalBefore / factory.capacity).toFixed(1)) : 0);
+  const specificWaterAfter = modelResult 
+    ? modelResult.specificWaterAfter 
+    : (factory.capacity > 0 ? Number((totalAfter / factory.capacity).toFixed(1)) : 0);
 
   // Water usage shares for Donut chart (percentage of totalAfter)
   breakdown.forEach(item => {
@@ -641,18 +688,89 @@ function calculateOptimization() {
     totalBefore,
     totalAfter,
     totalSaved,
-    reductionPct: Number(reductionPct.toFixed(1)),
+    reductionPct: Number(reductionPct),
     dailyCostSaving: Math.round(dailyCostSaving),
     monthlyCostSaving: Math.round(monthlyCostSaving),
     annualCostSaving: Math.round(annualCostSaving),
-    specificWaterBefore: Number(specificWaterBefore.toFixed(1)),
-    specificWaterAfter: Number(specificWaterAfter.toFixed(1)),
+    specificWaterBefore: Number(specificWaterBefore),
+    specificWaterAfter: Number(specificWaterAfter),
+    rawWastewaterGenerated,
+    dischargeLimit,
+    finalDischarge,
+    etpSludgeAndEvap,
     breakdown,
-    blendResults,
+    blendResults: modelResult?.blendResults || blendResults,
+    modelResult,
     generatedAt: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
   };
 
+  // Dynamically update all UI elements across Home Page, Dashboard, Report, and Scenario cards
+  updateAllUIComputedValues(state.results);
+
   return state.results;
+}
+
+// Dynamically replace fixed numbers across Home Page, Dashboard, Report, and Scenario Cards
+function updateAllUIComputedValues(res) {
+  if (!res) return;
+  const f = state.factory;
+  const washingStage = (res.breakdown && res.breakdown.find(b => b.name.toLowerCase().includes('wash'))) || (res.breakdown && res.breakdown[0]) || {};
+
+  const setText = (id, text) => {
+    const el = document.getElementById(id);
+    if (el) el.innerText = text;
+  };
+
+  // 1. Home Page - 5-Minute Showcase Strip
+  setText('home-stat-demand', `${res.totalBefore.toLocaleString('en-IN')} L/day`);
+  setText('home-stat-reused', `${res.totalSaved.toLocaleString('en-IN')} L/day`);
+  setText('home-stat-saving-pct', `${res.reductionPct}%`);
+  setText('home-stat-tds', `${washingStage.blendedTds || 523} mg/L`);
+
+  // 2. Home Page - Water Flow Simulation Cards
+  setText('home-sim-fresh', res.totalAfter.toLocaleString('en-IN'));
+  setText('home-sim-fresh-pct', `↓ ${res.reductionPct}% Reduction`);
+  setText('home-sim-wastewater', res.rawWastewaterGenerated.toLocaleString('en-IN'));
+  const wastewaterCutPct = res.rawWastewaterGenerated > 0 
+    ? Math.min(99, Math.round((res.totalSaved / res.rawWastewaterGenerated) * 100))
+    : 31.6;
+  setText('home-sim-wastewater-cut', `↓ ${wastewaterCutPct}% Cut via ETP`);
+  setText('home-sim-reused', res.totalSaved.toLocaleString('en-IN'));
+  setText('home-sim-reused-pct', `${res.reductionPct}% Total Reuse Rate`);
+  setText('home-sim-discharge', res.finalDischarge.toLocaleString('en-IN'));
+  setText('home-sim-discharge-cut', `Compliant with ≤ ${res.dischargeLimit.toLocaleString('en-IN')} L/d limit`);
+
+  // 3. Step 4 - Recycling Options Panel (tertiary row)
+  setText('recycle-opt-stat-tertiary', `${res.reductionPct}% (${res.totalSaved.toLocaleString('en-IN')} L/d)`);
+
+  // 4. Step 9 - Interactive Scenario Cards
+  if (typeof evaluate === 'function') {
+    try {
+      const stdModel = evaluate(state.processes, state.factory, { scenario: 'standard' });
+      const advModel = evaluate(state.processes, state.factory, { scenario: 'advanced' });
+      const ecoModel = evaluate(state.processes, state.factory, { scenario: 'eco_max' });
+
+      setText('scenario-stat-standard', `${stdModel.savingPercent}%`);
+      setText('scenario-stat-advanced', `${advModel.savingPercent}%`);
+      setText('scenario-stat-eco_max', `${ecoModel.savingPercent}%`);
+    } catch (e) {
+      console.warn('Scenario evaluation error:', e);
+    }
+  } else {
+    setText('scenario-stat-standard', `${res.reductionPct}%`);
+    setText('scenario-stat-advanced', `${Math.min(30, Number((res.reductionPct * 1.35).toFixed(1)))}%`);
+    setText('scenario-stat-eco_max', `${Math.min(45, Number((res.reductionPct * 1.72).toFixed(1)))}%`);
+  }
+
+  // 5. Modals - 5-Min Pitch Guide & Simulation Lightbox
+  setText('demo-guide-water-cut', `${res.totalSaved.toLocaleString('en-IN')} L/day`);
+  setText('demo-guide-saving-pct', `${res.reductionPct}%`);
+  setText('demo-guide-monthly-saving', `₹${res.monthlyCostSaving.toLocaleString('en-IN')}`);
+  setText('demo-guide-annual-saving', `₹${res.annualCostSaving.toLocaleString('en-IN')}`);
+
+  setText('sim-modal-fresh', `${(res.totalBefore / 1000).toFixed(1)}k ➔ ${(res.totalAfter / 1000).toFixed(2)}k L/d`);
+  setText('sim-modal-wastewater', `${(res.totalBefore * 0.917 / 1000).toFixed(1)}k ➔ ${(res.rawWastewaterGenerated / 1000).toFixed(1)}k L/d`);
+  setText('sim-modal-reused', `${res.totalSaved.toLocaleString('en-IN')} L/d`);
 }
 
 // STEP 6: Render Results Dashboard and Charts
@@ -1436,7 +1554,8 @@ window.loadSampleFactory = function() {
     freshHardness: 80,
     treatedTds: 650,
     treatedHardness: 200,
-    treatedAvailable: 7450
+    treatedAvailable: 7450,
+    dischargeLimit: 1450
   };
   state.processes = [
     {

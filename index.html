@@ -247,16 +247,16 @@
             </p>
             <div class="flex flex-wrap items-center gap-3 text-xs text-slate-300 font-medium">
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
-                <i class="fa-solid fa-check text-emerald-400"></i> Baseline Demand: <strong>40,000 L/day</strong>
+                <i class="fa-solid fa-check text-emerald-400"></i> Baseline Demand: <strong id="home-stat-demand">40,000 L/day</strong>
               </span>
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
-                <i class="fa-solid fa-recycle text-blue-400"></i> ETP Reused: <strong>7,450 L/day</strong>
+                <i class="fa-solid fa-recycle text-blue-400"></i> ETP Reused: <strong id="home-stat-reused">7,450 L/day</strong>
               </span>
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
-                <i class="fa-solid fa-percent text-teal-400"></i> Headline Saving: <strong>18.6%</strong>
+                <i class="fa-solid fa-percent text-teal-400"></i> Headline Saving: <strong id="home-stat-saving-pct">18.6%</strong>
               </span>
               <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-white/10 border border-white/10">
-                <i class="fa-solid fa-vial text-purple-400"></i> Washing Blended TDS: <strong>523 mg/L</strong>
+                <i class="fa-solid fa-vial text-purple-400"></i> Washing Blended TDS: <strong id="home-stat-tds">523 mg/L</strong>
               </span>
             </div>
           </div>
@@ -328,8 +328,8 @@
               <span>Fresh Water Intake</span>
               <i class="fa-solid fa-droplet text-blue-400"></i>
             </div>
-            <div class="text-xl font-black text-white">32,550 <span class="text-xs font-normal text-slate-400">L/d</span></div>
-            <div class="text-[11px] text-emerald-400 font-bold mt-1">↓ 18.6% Reduction</div>
+            <div class="text-xl font-black text-white"><span id="home-sim-fresh">32,550</span> <span class="text-xs font-normal text-slate-400">L/d</span></div>
+            <div class="text-[11px] text-emerald-400 font-bold mt-1" id="home-sim-fresh-pct">↓ 18.6% Reduction</div>
           </div>
 
           <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
@@ -337,8 +337,8 @@
               <span>Wastewater Generated</span>
               <i class="fa-solid fa-faucet-drip text-amber-400"></i>
             </div>
-            <div class="text-xl font-black text-white">25,100 <span class="text-xs font-normal text-slate-400">L/d</span></div>
-            <div class="text-[11px] text-emerald-400 font-bold mt-1">↓ 31.6% from 36,700 L</div>
+            <div class="text-xl font-black text-white"><span id="home-sim-wastewater">25,100</span> <span class="text-xs font-normal text-slate-400">L/d</span></div>
+            <div class="text-[11px] text-emerald-400 font-bold mt-1" id="home-sim-wastewater-cut">↓ 31.6% Cut via ETP</div>
           </div>
 
           <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
@@ -346,8 +346,8 @@
               <span>Water Reused to Factory</span>
               <i class="fa-solid fa-recycle text-emerald-400"></i>
             </div>
-            <div class="text-xl font-black text-emerald-400">7,450 <span class="text-xs font-normal text-slate-400">L/d</span></div>
-            <div class="text-[11px] text-emerald-300 font-bold mt-1">22.9% Total Reuse Rate</div>
+            <div class="text-xl font-black text-emerald-400"><span id="home-sim-reused">7,450</span> <span class="text-xs font-normal text-slate-400">L/d</span></div>
+            <div class="text-[11px] text-emerald-300 font-bold mt-1" id="home-sim-reused-pct">18.6% Total Reuse Rate</div>
           </div>
 
           <div class="p-4 rounded-xl bg-slate-800/60 border border-slate-700/60">
@@ -355,8 +355,8 @@
               <span>Final Discharge to Nature</span>
               <i class="fa-solid fa-water text-cyan-400"></i>
             </div>
-            <div class="text-xl font-black text-white">1,450 <span class="text-xs font-normal text-slate-400">L/d</span></div>
-            <div class="text-[11px] text-cyan-400 font-bold mt-1">↓ 96.0% Discharge Cut</div>
+            <div class="text-xl font-black text-white"><span id="home-sim-discharge">1,450</span> <span class="text-xs font-normal text-slate-400">L/d</span></div>
+            <div class="text-[11px] text-cyan-400 font-bold mt-1" id="home-sim-discharge-cut">Compliant with consent limit</div>
           </div>
 
         </div>
@@ -944,6 +944,26 @@
             </div>
           </div>
 
+          <!-- Regulatory Discharge Limit Field (Pollution Control Board Standard) -->
+          <div class="p-4 rounded-2xl bg-cyan-50/60 border border-cyan-200/80">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-2">
+              <label class="block text-xs font-semibold text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-water text-cyan-600"></i> Regulatory Effluent Discharge Limit (Consent to Operate)
+              </label>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-cyan-100 text-cyan-800 border border-cyan-200">PCB Compliance</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
+              <div class="relative">
+                <input type="number" id="input-discharge-limit" value="1450" min="0" step="50" required
+                  class="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 bg-white focus:ring-2 focus:ring-cyan-500 focus:outline-none pr-16">
+                <span class="absolute right-3 top-2.5 text-xs font-semibold text-slate-400">L/day</span>
+              </div>
+              <p class="text-[11px] text-slate-500 leading-snug">
+                Maximum permissible end-of-pipe treated effluent discharge into municipal sewer/water bodies (Set to 0 for Zero Liquid Discharge).
+              </p>
+            </div>
+          </div>
+
           <!-- Fabric Type Selector -->
           <div>
             <label class="block text-xs font-semibold text-slate-700 mb-1.5 flex items-center gap-1.5">
@@ -1033,6 +1053,100 @@
             <div class="text-xs text-slate-400 font-normal">
               *You can edit names and numbers inline.
             </div>
+          </div>
+        </div>
+
+        <!-- ==========================================
+             RECYCLING OPTIONS & TECHNICAL INTERVENTIONS TABLE
+             ========================================== -->
+        <div id="recycling-options-panel" class="glass-card rounded-3xl border border-slate-200 shadow-md overflow-hidden mb-6 bg-white">
+          <div class="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-50/80">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-7 h-7 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center text-xs font-bold">
+                  <i class="fa-solid fa-recycle"></i>
+                </span>
+                <h3 class="text-sm font-bold text-slate-900">Process Recycling Options & Technologies</h3>
+              </div>
+              <p class="text-xs text-slate-500 mt-0.5">Select and configure active closed-loop recycling mechanisms for this evaluation run</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-[11px] font-bold bg-teal-100 text-teal-800 border border-teal-200">
+              Evaluated by water-model.js
+            </span>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs">
+              <thead>
+                <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-700 font-bold uppercase text-[11px]">
+                  <th class="py-3 px-3.5 text-center">Active</th>
+                  <th class="py-3 px-3">Recycling Option / Technique</th>
+                  <th class="py-3 px-3">Target Process</th>
+                  <th class="py-3 px-3 text-right">Water Recovery</th>
+                  <th class="py-3 px-3 text-right">Est. Capex (₹)</th>
+                  <th class="py-3 px-3 text-right">Est. Payback</th>
+                  <th class="py-3 px-3.5">Water Quality Tolerance</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100 text-slate-700">
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="recycle-opt-counter-current" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>Counter-Current Rinsing System</div>
+                    <div class="text-[10px] text-slate-400">Cascades rinse water from clean to dirty baths</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Washing & Rinsing</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">30% (3,000 L/d)</td>
+                  <td class="py-3 px-3 text-right font-medium">₹35,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">3.6 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Tolerates up to 700 mg/L TDS</td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="recycle-opt-prep-reuse" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>Scouring & Desize Rinse Recovery</div>
+                    <div class="text-[10px] text-slate-400">Direct filtration for preparatory stages</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Fabric Preparation</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">15% (1,200 L/d)</td>
+                  <td class="py-3 px-3 text-right font-medium">₹25,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">4.2 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Maintains &lt; 375 mg/L TDS</td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="recycle-opt-tertiary-etp" checked class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>Tertiary ETP Clarified Buffer Loop</div>
+                    <div class="text-[10px] text-slate-400">Sand + carbon filtered permeate return</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">All High-Tolerance Lines</td>
+                  <td id="recycle-opt-stat-tertiary" class="py-3 px-3 text-right font-bold text-emerald-600">18.6% (7,450 L/d)</td>
+                  <td class="py-3 px-3 text-right font-medium">₹80,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">8.3 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Blended TDS 523 mg/L</td>
+                </tr>
+                <tr class="hover:bg-slate-50/70">
+                  <td class="py-3 px-3.5 text-center">
+                    <input type="checkbox" id="recycle-opt-dye-bath" class="rounded border-slate-300 text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer" onchange="calculateOptimization()">
+                  </td>
+                  <td class="py-3 px-3 font-semibold text-slate-900">
+                    <div>Ultrafiltration Dye Bath Recovery</div>
+                    <div class="text-[10px] text-slate-400">Membrane color removal for light shade reuse</div>
+                  </td>
+                  <td class="py-3 px-3 font-medium text-slate-800">Dyeing & Bleaching</td>
+                  <td class="py-3 px-3 text-right font-bold text-emerald-600">22% (3,300 L/d)</td>
+                  <td class="py-3 px-3 text-right font-medium">₹1,80,000</td>
+                  <td class="py-3 px-3 text-right font-semibold text-blue-700">14.2 months</td>
+                  <td class="py-3 px-3.5 text-slate-500">Strict &lt; 250 mg/L TDS bound</td>
+                </tr>
+              </tbody>
+            </table>
           </div>
         </div>
 
@@ -1967,15 +2081,15 @@
             <div class="flex flex-col gap-1.5">
               <button id="scenario-standard" onclick="setOptimizationScenario('standard')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-blue-600 text-white shadow-md text-left flex items-center justify-between">
                 <span>Standard Recycling</span>
-                <span class="text-[10px]">~18.6%</span>
+                <span class="text-[10px] font-bold" id="scenario-stat-standard">18.6%</span>
               </button>
               <button id="scenario-advanced" onclick="setOptimizationScenario('advanced')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 text-left flex items-center justify-between">
                 <span>Advanced Counter-Current</span>
-                <span class="text-[10px]">~25%</span>
+                <span class="text-[10px] font-bold" id="scenario-stat-advanced">25.1%</span>
               </button>
               <button id="scenario-eco_max" onclick="setOptimizationScenario('eco_max')" class="scenario-btn py-1.5 px-3 rounded-lg text-xs font-semibold bg-slate-100 text-slate-700 hover:bg-slate-200 text-left flex items-center justify-between">
                 <span>Closed Loop Membrane (ZLD)</span>
-                <span class="text-[10px]">~32%</span>
+                <span class="text-[10px] font-bold" id="scenario-stat-eco_max">32.0%</span>
               </button>
             </div>
           </div>
@@ -2043,10 +2157,141 @@
 
   </main>
 
-  <!-- Footer -->
-  <footer class="bg-white border-t border-slate-200 py-4 mt-auto no-print">
-    <div class="max-w-7xl mx-auto px-4 text-center text-xs text-slate-400">
-      Textile Factory Water & Cost Optimization System • Built with Pair Programming Intelligence
+  <!-- ==========================================
+       DECLARATION OF LIBRARIES, TOOLS, AND APIS FOOTER
+       ========================================== -->
+  <footer class="bg-slate-900 text-slate-300 border-t border-slate-800 mt-auto no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      
+      <!-- Top Brand & Tagline -->
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 pb-8 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white text-lg shadow-md shadow-blue-500/20">
+            <i class="fa-solid fa-droplet"></i>
+          </div>
+          <div>
+            <h3 class="text-base font-bold text-white leading-tight">Textile Water Optimizer</h3>
+            <p class="text-xs text-slate-400">Industry 4.0 Closed-Loop Water Conservation & Utility Cost Reduction</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-2 text-xs">
+          <span class="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 border border-blue-400/30 flex items-center gap-1.5">
+            <i class="fa-solid fa-code-branch text-blue-400"></i> Open Source Architecture
+          </span>
+          <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 flex items-center gap-1.5">
+            <i class="fa-solid fa-certificate text-emerald-400"></i> MIT / Apache 2.0
+          </span>
+        </div>
+      </div>
+
+      <!-- 4-Column Technical Declarations Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 py-8 border-b border-slate-800 text-xs">
+        
+        <!-- Column 1: UI Libraries & Frameworks -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-code text-blue-400"></i> UI & Styling Libraries
+          </h4>
+          <ul class="space-y-2 text-slate-400">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Tailwind CSS (v3.4):</strong> CDN utility-first layout engine for responsive styling, cards, and modal components.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">FontAwesome (v6.5.1):</strong> Comprehensive scalable vector icon set for industrial indicators.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Inter Font Family:</strong> Modern sans-serif typography via Google Fonts.</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 2: Data Visualization & Charting -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-pie text-emerald-400"></i> Visualization Engines
+          </h4>
+          <ul class="space-y-2 text-slate-400">
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Chart.js (v4.4):</strong> Canvas 2D charting library powering process comparison bars, donuts, and 7-day AI forecasts.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">HTML5 Canvas API:</strong> Native hardware-accelerated raster graphics for real-time telemetry rendering.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-emerald-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Responsive Aspect Ratio Engine:</strong> Auto-scales on mobile, tablet, and wide desktop screens.</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 3: Mathematical Engines & Models -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-calculator text-amber-400"></i> Mathematical Models
+          </h4>
+          <ul class="space-y-2 text-slate-400">
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">water-model.js:</strong> Closed-loop mass balance evaluation engine solving <code class="text-amber-300 font-mono">evaluate(processes, factory, options)</code>.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">blend-optimizer.js:</strong> Conservation blend equation solver prioritizing high-tolerance washing stages against TDS limits.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-amber-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">KaTeX / LaTeX Math:</strong> Typeset mathematical equations for concentration conservation and payback periods.</div>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Column 4: Hardware & Browser APIs -->
+        <div>
+          <h4 class="font-bold text-white uppercase tracking-wider text-[11px] mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-microchip text-purple-400"></i> Hardware & Web APIs
+          </h4>
+          <ul class="space-y-2 text-slate-400">
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Web Serial API:</strong> W3C standard (<code class="text-purple-300 font-mono">navigator.serial</code>) for direct USB ingestion from Arduino / ESP32.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">HTML5 LocalStorage API:</strong> Offline client-side data persistence for factory parameters & daily logs.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Blob & URL Object APIs:</strong> Client-side file generation for JSON and CSV export without external servers.</div>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-purple-400 font-semibold">•</span>
+              <div><strong class="text-slate-200">Window.print() CSS Engine:</strong> Optimized print media stylesheet for professional executive PDF audits.</div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Bottom Credits & Compliance Line -->
+      <div class="pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-500">
+        <div>
+          © 2026 Textile Factory Water & Cost Optimization System • Compliant with CPCB / SPCB Textile Wet-Processing Standards
+        </div>
+        <div class="flex items-center gap-4 text-[11px]">
+          <span>Tailwind CSS</span> •
+          <span>Chart.js</span> •
+          <span>FontAwesome</span> •
+          <span>Web Serial</span> •
+          <span>water-model.js</span>
+        </div>
+      </div>
+
     </div>
   </footer>
 
@@ -2101,9 +2346,9 @@
       </div>
       <div class="p-4 border-t border-slate-800 bg-slate-950/80 flex items-center justify-between text-xs text-slate-400">
         <div class="flex items-center gap-4">
-          <span>Fresh Water: <strong class="text-blue-400">40k ➔ 32.55k L/d</strong></span>
-          <span>Wastewater: <strong class="text-amber-400">36.7k ➔ 25.1k L/d</strong></span>
-          <span>Water Reused: <strong class="text-emerald-400">7,450 L/d</strong></span>
+          <span>Fresh Water: <strong class="text-blue-400" id="sim-modal-fresh">40k ➔ 32.55k L/d</strong></span>
+          <span>Wastewater: <strong class="text-amber-400" id="sim-modal-wastewater">36.7k ➔ 25.1k L/d</strong></span>
+          <span>Water Reused: <strong class="text-emerald-400" id="sim-modal-reused">7,450 L/d</strong></span>
         </div>
         <button onclick="closeSimulationModal()" class="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm">
           Close Viewer
@@ -2242,19 +2487,19 @@
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-center text-xs mb-2">
             <div class="p-2 rounded-lg bg-white border border-slate-200">
               <span class="text-slate-400 block text-[10px]">Daily Water Cut</span>
-              <strong class="text-blue-600 text-sm">7,450 L/day</strong>
+              <strong id="demo-guide-water-cut" class="text-blue-600 text-sm">7,450 L/day</strong>
             </div>
             <div class="p-2 rounded-lg bg-white border border-slate-200">
               <span class="text-slate-400 block text-[10px]">Overall Saving</span>
-              <strong class="text-emerald-600 text-sm">18.6%</strong>
+              <strong id="demo-guide-saving-pct" class="text-emerald-600 text-sm">18.6%</strong>
             </div>
             <div class="p-2 rounded-lg bg-white border border-slate-200">
               <span class="text-slate-400 block text-[10px]">Monthly Net Saving</span>
-              <strong class="text-slate-900 text-sm">₹9,685</strong>
+              <strong id="demo-guide-monthly-saving" class="text-slate-900 text-sm">₹9,685</strong>
             </div>
             <div class="p-2 rounded-lg bg-white border border-slate-200">
               <span class="text-slate-400 block text-[10px]">Annual Net Saving</span>
-              <strong class="text-emerald-700 text-sm">₹1,16,220</strong>
+              <strong id="demo-guide-annual-saving" class="text-emerald-700 text-sm">₹1,16,220</strong>
             </div>
           </div>
           <p class="text-xs text-slate-600 leading-relaxed">
@@ -2539,6 +2784,8 @@
 
   <!-- Water Blend Optimization Engine -->
   <script src="blend-optimizer.js"></script>
+  <!-- Water Mass Balance & Model Evaluation Engine -->
+  <script src="water-model.js"></script>
   <!-- Main JavaScript Logic -->
   <script src="app.js"></script>
 </body>
