@@ -99,7 +99,8 @@ const state = {
   ],
   scenario: 'standard', // 'standard' | 'advanced' | 'eco_max'
   targetReductionPct: 20,
-  results: null
+  results: null,
+  dailyLogs: []
 };
 
 // Global chart references for updating
@@ -107,10 +108,12 @@ let barChartInstance = null;
 let donutChartInstance = null;
 let reportChartInstance = null;
 let aiForecastChartInstance = null;
+let dailyTrendChartInstance = null;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   loadSavedData();
+  loadDailyLogs();
   renderProcessTable();
   setupEventListeners();
   updateStepUI(1);
@@ -673,11 +676,12 @@ function renderResultsDashboard() {
     annualEl.innerText = `₹${res.annualCostSaving.toLocaleString('en-IN')} / year`;
   }
 
-  // Render Charts, Blend Table, and AI Prediction Engine
+  // Render Charts, Blend Table, AI Prediction Engine, and Everyday Daily Logs
   renderBarChart();
   renderDonutChart();
   renderBlendTable();
   runAiWaterPrediction();
+  renderDailyLogs();
 }
 
 // Render Per-Stage Water Blend Optimization Table in Step 6
@@ -1521,8 +1525,465 @@ document.addEventListener('keydown', (e) => {
     closeFlowchartModal();
     closeSimulationModal();
     closeAuditFindingsModal();
+    closeDailyLogModal();
   }
 });
+
+// ============================================================================
+// DAY-TO-DAY OPERATIONAL WATER LOGBOOK & DAILY TRACKING LOGIC
+// ============================================================================
+
+// Initialize default realistic 15-day factory dataset leading to today
+function getBenchmarkDailyLogs() {
+  const today = new Date();
+  const logs = [];
+  const templates = [
+    { fabric: 1000, fresh: 32550, reused: 7450, tds: 523, notes: 'Standard Cotton Single Jersey batch', status: 'Optimal' },
+    { fabric: 1050, fresh: 33200, reused: 7800, tds: 518, notes: 'Reactive Navy Dyeing & rinse', status: 'Target Met' },
+    { fabric: 980,  fresh: 31800, reused: 7400, tds: 525, notes: 'Bleached White Knits', status: 'Optimal' },
+    { fabric: 1100, fresh: 34500, reused: 8200, tds: 540, notes: 'Denim Twill Multi-wash', status: 'Target Met' },
+    { fabric: 1000, fresh: 32400, reused: 7600, tds: 520, notes: 'Cotton-Polyester Blend 60/40', status: 'Optimal' },
+    { fabric: 1020, fresh: 33000, reused: 7700, tds: 522, notes: 'Medium Shade Olive Green', status: 'Optimal' },
+    { fabric: 880,  fresh: 29000, reused: 6800, tds: 512, notes: 'Short Batch Finishing', status: 'Optimal' },
+    { fabric: 1000, fresh: 32600, reused: 7400, tds: 535, notes: 'Bio-polishing & Softener wash', status: 'Optimal' },
+    { fabric: 1080, fresh: 34000, reused: 8400, tds: 548, notes: 'Deep Reactive Black Run', status: 'High Recovery' },
+    { fabric: 1000, fresh: 32550, reused: 7450, tds: 523, notes: 'Full Continuous Washing line', status: 'Optimal' },
+    { fabric: 970,  fresh: 31600, reused: 7350, tds: 520, notes: 'Light Pastel Yellow Knits', status: 'Optimal' },
+    { fabric: 1040, fresh: 33400, reused: 7800, tds: 527, notes: 'Terry Towel Scouring & Bleach', status: 'Optimal' },
+    { fabric: 1000, fresh: 32500, reused: 7500, tds: 524, notes: 'Peroxide Bleach wash line', status: 'Optimal' },
+    { fabric: 1020, fresh: 32800, reused: 7700, tds: 522, notes: 'Mercerized Cotton single yarn', status: 'Optimal' },
+    { fabric: 1000, fresh: 32550, reused: 7450, tds: 523, notes: 'Today Active Metering', status: 'Active Today' }
+  ];
+
+  for (let i = 14; i >= 0; i--) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    const dateStr = d.toISOString().split('T')[0];
+    const t = templates[14 - i];
+    const total = t.fresh + t.reused;
+    const reusePct = ((t.reused / total) * 100).toFixed(1);
+    const intensity = (total / t.fabric).toFixed(1);
+    const costSaved = Math.round(t.reused * (state.factory.waterCost || 50) / 1000);
+    logs.push({
+      id: 'log-' + dateStr + '-' + (14 - i),
+      date: dateStr,
+      shift: i === 0 ? 'Today' : 'Full Day',
+      fabricKg: t.fabric,
+      freshL: t.fresh,
+      reusedL: t.reused,
+      totalL: total,
+      reusePct: parseFloat(reusePct),
+      tds: t.tds,
+      hardness: Math.round(t.tds * 0.27),
+      intensity: parseFloat(intensity),
+      costSaved: costSaved,
+      status: t.status,
+      notes: t.notes
+    });
+  }
+  return logs;
+}
+
+// Load daily logs from storage
+function loadDailyLogs() {
+  try {
+    const saved = localStorage.getItem('textile_water_daily_logs');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        state.dailyLogs = parsed;
+        return;
+      }
+    }
+  } catch (e) {
+    console.error('Error loading daily logs:', e);
+  }
+  state.dailyLogs = getBenchmarkDailyLogs();
+  saveDailyLogs();
+}
+
+// Save daily logs to storage
+function saveDailyLogs() {
+  try {
+    localStorage.setItem('textile_water_daily_logs', JSON.stringify(state.dailyLogs || []));
+  } catch (e) {
+    console.error('Error saving daily logs:', e);
+  }
+}
+
+// Render Daily Logs Table & Ribbon Stats
+window.renderDailyLogs = function() {
+  if (!state.dailyLogs || !state.dailyLogs.length) {
+    loadDailyLogs();
+  }
+
+  const logs = state.dailyLogs || [];
+  const tbody = document.getElementById('daily-logs-table-body');
+  if (tbody) {
+    tbody.innerHTML = '';
+    
+    // Sort latest first
+    const sorted = [...logs].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    sorted.forEach((item) => {
+      let badgeHtml = '';
+      if (item.status === 'Active Today') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-1 w-fit"><span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span> Today</span>`;
+      } else if (item.status === 'High Recovery') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 text-purple-800 border border-purple-200">★ High Recovery</span>`;
+      } else if (item.status === 'Target Met') {
+        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">✓ Target Met</span>`;
+      } else {
+        badgeHtml = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">✓ Optimal</span>`;
+      }
+
+      const tr = document.createElement('tr');
+      tr.className = 'hover:bg-slate-50/80 transition-colors text-xs text-slate-700';
+      tr.innerHTML = `
+        <td class="py-3 px-3.5 font-bold text-slate-900">
+          <div>${item.date}</div>
+          <div class="text-[10px] text-slate-400 font-normal">${item.shift || 'Full Day'}</div>
+        </td>
+        <td class="py-3 px-3 text-right font-medium text-slate-800">${(item.fabricKg || 0).toLocaleString('en-IN')}</td>
+        <td class="py-3 px-3 text-right font-semibold text-blue-600">${(item.freshL || 0).toLocaleString('en-IN')}</td>
+        <td class="py-3 px-3 text-right font-bold text-emerald-600">${(item.reusedL || 0).toLocaleString('en-IN')}</td>
+        <td class="py-3 px-3 text-right font-bold text-slate-900">${(item.totalL || 0).toLocaleString('en-IN')}</td>
+        <td class="py-3 px-3 text-right font-bold text-teal-700">${item.reusePct}%</td>
+        <td class="py-3 px-3 text-right font-medium text-slate-700">${item.tds || '-'}</td>
+        <td class="py-3 px-3 text-right font-bold ${item.intensity <= 40 ? 'text-emerald-600' : 'text-amber-600'}">${item.intensity || '-'}</td>
+        <td class="py-3 px-3 text-right font-bold text-slate-900">₹${(item.costSaved || 0).toLocaleString('en-IN')}</td>
+        <td class="py-3 px-3.5">
+          <div class="mb-1">${badgeHtml}</div>
+          <div class="text-[10px] text-slate-500 line-clamp-1" title="${item.notes || ''}">${item.notes || 'Routine run'}</div>
+        </td>
+        <td class="py-3 px-3 text-center">
+          <button onclick="deleteDailyLog('${item.id}')" class="w-6 h-6 rounded-md hover:bg-red-50 text-slate-400 hover:text-red-600 transition-colors" title="Delete entry">
+            <i class="fa-regular fa-trash-can text-xs"></i>
+          </button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  // Update Ribbon Summary
+  const count = logs.length;
+  const sumReused = logs.reduce((acc, cur) => acc + (cur.reusedL || 0), 0);
+  const sumCost = logs.reduce((acc, cur) => acc + (cur.costSaved || 0), 0);
+  const avgIntensity = count ? (logs.reduce((acc, cur) => acc + (cur.intensity || 0), 0) / count).toFixed(1) : 0;
+
+  const statDays = document.getElementById('daily-stat-days');
+  if (statDays) statDays.innerText = `${count} Days`;
+
+  const statSaved = document.getElementById('daily-stat-saved-water');
+  if (statSaved) statSaved.innerText = `${sumReused.toLocaleString('en-IN')} L`;
+
+  const statCost = document.getElementById('daily-stat-saved-cost');
+  if (statCost) statCost.innerText = `₹${sumCost.toLocaleString('en-IN')}`;
+
+  const statIntensity = document.getElementById('daily-stat-intensity');
+  if (statIntensity) statIntensity.innerText = `${avgIntensity} L/kg`;
+
+  // Render Daily Trend Chart
+  renderDailyTrendChart();
+};
+
+// Render Day-to-Day Trend Chart
+function renderDailyTrendChart() {
+  const ctx = document.getElementById('chart-daily-trend');
+  if (!ctx) return;
+
+  const sorted = [...(state.dailyLogs || [])].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const labels = sorted.map(d => {
+    const parts = d.date.split('-');
+    return `${parts[2]}/${parts[1]}`;
+  });
+  const freshData = sorted.map(d => d.freshL);
+  const reusedData = sorted.map(d => d.reusedL);
+  const tdsData = sorted.map(d => d.tds);
+
+  if (dailyTrendChartInstance) {
+    dailyTrendChartInstance.destroy();
+  }
+
+  dailyTrendChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [
+        {
+          label: 'Fresh Water Intake (L)',
+          data: freshData,
+          backgroundColor: 'rgba(59, 130, 246, 0.85)',
+          borderRadius: 6,
+          stack: 'water'
+        },
+        {
+          label: 'Recycled ETP Water (L)',
+          data: reusedData,
+          backgroundColor: 'rgba(16, 185, 129, 0.85)',
+          borderRadius: 6,
+          stack: 'water'
+        },
+        {
+          label: 'Treated Water TDS (mg/L)',
+          data: tdsData,
+          type: 'line',
+          borderColor: '#8b5cf6',
+          backgroundColor: 'transparent',
+          borderWidth: 2,
+          pointRadius: 3,
+          pointBackgroundColor: '#8b5cf6',
+          yAxisID: 'y1'
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      interaction: {
+        mode: 'index',
+        intersect: false
+      },
+      scales: {
+        x: {
+          grid: { display: false }
+        },
+        y: {
+          stacked: true,
+          title: { display: true, text: 'Water Volume (Liters)' },
+          grid: { color: 'rgba(226, 232, 240, 0.6)' }
+        },
+        y1: {
+          position: 'right',
+          title: { display: true, text: 'TDS (mg/L)' },
+          grid: { display: false },
+          min: 400,
+          max: 700
+        }
+      },
+      plugins: {
+        legend: {
+          position: 'top',
+          labels: { font: { size: 11, weight: '600' } }
+        }
+      }
+    }
+  });
+}
+
+// Modal Controls for Log Today's Reading
+window.openDailyLogModal = function() {
+  const modal = document.getElementById('daily-log-modal');
+  if (modal) {
+    const dateInput = document.getElementById('daily-form-date');
+    if (dateInput) {
+      dateInput.value = new Date().toISOString().split('T')[0];
+    }
+    const fabricInput = document.getElementById('daily-form-fabric');
+    if (fabricInput) fabricInput.value = state.factory.capacity || 1000;
+    
+    modal.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+  }
+};
+
+window.closeDailyLogModal = function() {
+  const modal = document.getElementById('daily-log-modal');
+  if (modal) {
+    modal.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+};
+
+// Auto-fill daily form with current optimizer benchmark
+window.autoFillDailyFormBaseline = function() {
+  const f = state.factory;
+  const res = state.results || calculateOptimization();
+  
+  const fabricInput = document.getElementById('daily-form-fabric');
+  if (fabricInput) fabricInput.value = f.capacity || 1000;
+
+  const freshInput = document.getElementById('daily-form-fresh');
+  if (freshInput) freshInput.value = res.totalAfter || 32550;
+
+  const reusedInput = document.getElementById('daily-form-reused');
+  if (reusedInput) reusedInput.value = res.totalSaved || 7450;
+
+  const tdsInput = document.getElementById('daily-form-tds');
+  if (tdsInput) tdsInput.value = 523;
+
+  const notesInput = document.getElementById('daily-form-notes');
+  if (notesInput) notesInput.value = 'Cotton standard batch; counter-current active';
+};
+
+// Save submitted daily log
+window.handleSaveDailyLog = function(e) {
+  e.preventDefault();
+  const dateVal = document.getElementById('daily-form-date').value;
+  const shiftVal = document.getElementById('daily-form-shift').value;
+  const fabricVal = parseFloat(document.getElementById('daily-form-fabric').value) || 1000;
+  const freshVal = parseFloat(document.getElementById('daily-form-fresh').value) || 0;
+  const reusedVal = parseFloat(document.getElementById('daily-form-reused').value) || 0;
+  const tdsVal = parseFloat(document.getElementById('daily-form-tds').value) || 520;
+  const notesVal = document.getElementById('daily-form-notes').value || 'Standard daily processing';
+
+  const total = freshVal + reusedVal;
+  const reusePct = total > 0 ? parseFloat(((reusedVal / total) * 100).toFixed(1)) : 0;
+  const intensity = fabricVal > 0 ? parseFloat((total / fabricVal).toFixed(1)) : 0;
+  const costSaved = Math.round(reusedVal * (state.factory.waterCost || 50) / 1000);
+
+  let status = 'Optimal';
+  if (tdsVal > 540) status = 'Elevated TDS';
+  else if (reusePct >= 19) status = 'High Recovery';
+  else if (reusePct >= 18) status = 'Target Met';
+
+  const newEntry = {
+    id: 'log-' + dateVal + '-' + Date.now(),
+    date: dateVal,
+    shift: shiftVal,
+    fabricKg: fabricVal,
+    freshL: freshVal,
+    reusedL: reusedVal,
+    totalL: total,
+    reusePct: reusePct,
+    tds: tdsVal,
+    hardness: Math.round(tdsVal * 0.27),
+    intensity: intensity,
+    costSaved: costSaved,
+    status: status,
+    notes: notesVal
+  };
+
+  // Remove existing entry for same date and shift if any
+  state.dailyLogs = (state.dailyLogs || []).filter(item => !(item.date === dateVal && item.shift === shiftVal));
+  state.dailyLogs.push(newEntry);
+
+  saveDailyLogs();
+  closeDailyLogModal();
+  renderDailyLogs();
+};
+
+// 1-Click Quick Log for Today
+window.quickLogToday = function() {
+  const todayStr = new Date().toISOString().split('T')[0];
+  const f = state.factory;
+  const res = state.results || calculateOptimization();
+
+  const existingIdx = (state.dailyLogs || []).findIndex(l => l.date === todayStr);
+  const entry = {
+    id: 'log-' + todayStr + '-quick',
+    date: todayStr,
+    shift: 'Today',
+    fabricKg: f.capacity || 1000,
+    freshL: res.totalAfter || 32550,
+    reusedL: res.totalSaved || 7450,
+    totalL: res.totalBefore || 40000,
+    reusePct: res.reductionPct || 18.6,
+    tds: 523,
+    hardness: 142,
+    intensity: parseFloat(((res.totalBefore || 40000) / (f.capacity || 1000)).toFixed(1)),
+    costSaved: Math.round((res.totalSaved || 7450) * (f.waterCost || 50) / 1000),
+    status: 'Active Today',
+    notes: 'Auto-recorded today via 1-click telemetry benchmark'
+  };
+
+  if (existingIdx >= 0) {
+    state.dailyLogs[existingIdx] = entry;
+  } else {
+    state.dailyLogs.push(entry);
+  }
+
+  saveDailyLogs();
+  renderDailyLogs();
+};
+
+// Delete Daily Log
+window.deleteDailyLog = function(id) {
+  if (confirm('Are you sure you want to delete this daily log entry?')) {
+    state.dailyLogs = (state.dailyLogs || []).filter(item => item.id !== id);
+    saveDailyLogs();
+    renderDailyLogs();
+  }
+};
+
+// Reset Daily Logs to 15-Day Benchmark
+window.resetDailyLogsToBenchmark = function() {
+  if (confirm('Reset daily operational logs to standard 15-day factory benchmark?')) {
+    state.dailyLogs = getBenchmarkDailyLogs();
+    saveDailyLogs();
+    renderDailyLogs();
+  }
+};
+
+// Export Daily Logs to CSV
+window.exportDailyLogsCSV = function() {
+  const logs = state.dailyLogs || [];
+  if (!logs.length) {
+    alert('No daily logs to export.');
+    return;
+  }
+
+  const sorted = [...logs].sort((a, b) => new Date(a.date) - new Date(b.date));
+  const headers = ['Date', 'Shift', 'Fabric Production (kg)', 'Freshwater Intake (L)', 'Recycled Water (L)', 'Total Demand (L)', 'Reuse Percentage (%)', 'TDS (mg/L)', 'Hardness (mg/L)', 'Water Intensity (L/kg)', 'Daily Cost Saved (INR)', 'Status', 'Notes'];
+
+  let csvContent = '\uFEFF' + headers.join(',') + '\n';
+  sorted.forEach(row => {
+    const values = [
+      row.date,
+      `"${row.shift || 'Full Day'}"`,
+      row.fabricKg,
+      row.freshL,
+      row.reusedL,
+      row.totalL,
+      row.reusePct,
+      row.tds,
+      row.hardness,
+      row.intensity,
+      row.costSaved,
+      `"${row.status}"`,
+      `"${(row.notes || '').replace(/"/g, '""')}"`
+    ];
+    csvContent += values.join(',') + '\n';
+  });
+
+  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `textile-factory-daily-water-logs-${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+
+// Switch between Table and Chart views
+window.switchDailyView = function(view) {
+  const tableContainer = document.getElementById('daily-table-container');
+  const chartContainer = document.getElementById('daily-chart-container');
+  const tableBtn = document.getElementById('daily-view-table-btn');
+  const chartBtn = document.getElementById('daily-view-chart-btn');
+
+  if (view === 'chart') {
+    if (tableContainer) tableContainer.classList.add('hidden');
+    if (chartContainer) chartContainer.classList.remove('hidden');
+    if (tableBtn) {
+      tableBtn.className = 'px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+    }
+    if (chartBtn) {
+      chartBtn.className = 'px-3 py-1 rounded-md text-xs font-bold bg-white text-blue-700 shadow-sm transition-all flex items-center gap-1.5';
+    }
+    renderDailyTrendChart();
+  } else {
+    if (chartContainer) chartContainer.classList.add('hidden');
+    if (tableContainer) tableContainer.classList.remove('hidden');
+    if (chartBtn) {
+      chartBtn.className = 'px-3 py-1 rounded-md text-xs font-medium text-slate-600 hover:text-slate-900 transition-all flex items-center gap-1.5';
+    }
+    if (tableBtn) {
+      tableBtn.className = 'px-3 py-1 rounded-md text-xs font-bold bg-white text-blue-700 shadow-sm transition-all flex items-center gap-1.5';
+    }
+  }
+};
 
 
 
